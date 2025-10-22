@@ -1,0 +1,56 @@
+stages:
+  - check
+  - build
+  - deploy
+
+variables:
+  SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
+  GIT_DEPTH: "0"
+
+sonar-check:
+  stage: check
+  image: maven:3.8.3-openjdk-17
+  cache:
+    key: "${CI_JOB_NAME}"
+    paths:
+      - .sonar/cache
+  script:
+    - mvn verify sonar:sonar
+  only:
+    - main
+
+build:
+  stage: build
+  image: maven:3.8.3-openjdk-17
+  artifacts:
+    paths:
+      - target/pagamento.jar
+      - appspec.yml
+      - scripts/
+    expire_in: 1 day
+  script:
+    - mvn clean install -Dsonar.skip=true -DskipTests=true
+  only:
+    - main
+
+aws-deploy:
+  stage: deploy
+  image: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
+  script:
+    - mkdir deploy_package
+    
+    - cp target/pagamento.jar deploy_package/pagamento.jar
+    - cp appspec.yml deploy_package/appspec.yml
+    
+    - cp -r scripts/ deploy_package/scripts/
+
+    - cd deploy_package
+    - zip -r ../pagamento.zip .
+    - cd ..
+    
+    - aws deploy push --application-name bicicletario-pagamento --s3-location s3://bicicletario-pagamento/pagamento.zip --source pagamento.zip
+    - aws deploy create-deployment --application-name bicicletario-pagamento --deployment-group-name bicicletario --s3-location bucket=bicicletario-pagamento,key=pagamento.zip,bundleType=zip
+  only:
+    - main
+  dependencies:
+    - build
