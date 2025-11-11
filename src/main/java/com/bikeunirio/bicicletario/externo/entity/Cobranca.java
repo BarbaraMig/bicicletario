@@ -1,7 +1,9 @@
 package com.bikeunirio.bicicletario.externo.entity;
 
+import com.bikeunirio.bicicletario.externo.enums.StatusCobranca;
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -13,7 +15,7 @@ public class Cobranca{
 
     private String idApi;
 
-    private String status;
+    private StatusCobranca status;
 
 
     @Column(columnDefinition = "DATETIME")
@@ -23,7 +25,7 @@ public class Cobranca{
     @Column(columnDefinition = "DATETIME")
     private LocalDateTime horaFinalizacao;
 
-    private Integer valor;
+    private BigDecimal valor;
 
     private long idCiclista;
 
@@ -43,11 +45,11 @@ public class Cobranca{
         this.idApi = idApi;
     }
 
-    public String getStatus() {
+    public StatusCobranca getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(StatusCobranca status) {
         this.status = status;
     }
 
@@ -67,11 +69,11 @@ public class Cobranca{
         this.horaFinalizacao = horaFinalizacao;
     }
 
-    public Integer getValor() {
+    public BigDecimal getValor() {
         return valor;
     }
 
-    public void setValor(Integer valor) {
+    public void setValor(BigDecimal valor) {
         this.valor = valor;
     }
 

@@ -1,5 +1,6 @@
 package com.bikeunirio.bicicletario.externo.service;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 
 public class AutenticacaoService {
@@ -11,10 +12,11 @@ public class AutenticacaoService {
     private String clienteSecret;
 
     private final String urlBase ="https://api-m.sandbox.paypal.com";
+    //private final String
 
-    @PostMapping("/v1/oauth2/token")
-    public void gerarTokenCredencial(){
+    public String pedirTokenApi(){
 
+        return null;
     }
 
 }

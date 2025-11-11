@@ -37,8 +37,6 @@ public class CobrancaController {
             return ResponseEntity.notFound().build();
 
         return ResponseEntity.ok(cobrancaDesejada);
-
-
     }
 
     //Adiciona a cobrança em uma fila que será processada a cada 12h

@@ -1,3 +1,0 @@
-Precisa de uma classe cartão que seria um model
-As informações do cartão incluindo informações do dono do cartão?
-Ou ter um classe cliente vinculada ao cartão
