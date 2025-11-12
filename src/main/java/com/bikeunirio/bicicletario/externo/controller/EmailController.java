@@ -1,6 +1,7 @@
 package com.bikeunirio.bicicletario.externo.controller;
 
 import com.bikeunirio.bicicletario.externo.dto.EmailDto;
+import com.bikeunirio.bicicletario.externo.mapper.EmailMapper;
 import com.bikeunirio.bicicletario.externo.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,13 +21,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class EmailController {
-    @Autowired
-    private EmailService emailService;
+
+    private final EmailService emailService;
+
+    EmailController(EmailService emailService){
+        this.emailService=emailService;
+    }
 
     @PostMapping("/enviarEmail")
     public ResponseEntity<?> enviarEmail(@RequestBody EmailDto email){
-        emailService.enviarEmail(email);
-        return ResponseEntity.ok("Email enviado com sucesso");
+        return ResponseEntity.ok().body(emailService.enviarEmail(email));
     }
 
 }

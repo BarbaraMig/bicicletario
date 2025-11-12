@@ -1,9 +1,6 @@
 package com.bikeunirio.bicicletario.externo.entity;
 
 import jakarta.persistence.*;
-import org.springframework.format.annotation.DateTimeFormat;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name="logs_email")
@@ -23,6 +20,11 @@ public class Email{
 
     public Email(long id, String receptor, String assunto, String mensagem) {
         this.id=id;
+        this.receptor=receptor;
+        this.assunto=assunto;
+        this.mensagem=mensagem;
+    }
+    public Email(String receptor, String assunto, String mensagem) {
         this.receptor=receptor;
         this.assunto=assunto;
         this.mensagem=mensagem;

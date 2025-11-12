@@ -1,6 +1,6 @@
 package com.bikeunirio.bicicletario.externo.dto;
 
-import java.time.LocalDateTime;
+import com.bikeunirio.bicicletario.externo.entity.Email;
 
 public class EmailDto {
     private long id;
@@ -8,8 +8,19 @@ public class EmailDto {
     private String assunto;
     private String mensagem;
 
+    public EmailDto(){
+    }
 
-
+    public EmailDto(String receptor, String assunto, String mensagem) {
+        this.receptor = receptor;
+        this.assunto = assunto;
+        this.mensagem = mensagem;
+    }
+    /*
+    * git branch -m email dev
+git fetch origin
+git branch -u origin/dev dev
+git remote set-head origin -a*/
 
     public long getId() {
         return id;
