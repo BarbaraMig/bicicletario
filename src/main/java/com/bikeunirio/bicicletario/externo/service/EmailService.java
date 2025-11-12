@@ -20,7 +20,7 @@ public class EmailService {
     }
 
     @Async
-    public void enviarEmail(EmailDto emailEntity){
+    public String enviarEmail(EmailDto emailEntity){
         //construtor do SimpleMailMessage não recebe nenhum parâmetro
         SimpleMailMessage email = new SimpleMailMessage();
 
@@ -36,6 +36,6 @@ public class EmailService {
 
         EmailMapper emailMapper = new EmailMapper();
         emailRepository.save(emailMapper.dtoParaEntidade(emailEntity));
-        return;
+        return "Email enviado e salvo com sucesso";
     }
 }

@@ -15,7 +15,6 @@ public class EmailMapper {
         dto.setReceptor(emailEntidade.getReceptor());
         dto.setAssunto(emailEntidade.getAssunto());
         dto.setMensagem(emailEntidade.getMensagem());
-
         return dto;
     }
 

@@ -24,6 +24,11 @@ public class Email{
         this.assunto=assunto;
         this.mensagem=mensagem;
     }
+    public Email(String receptor, String assunto, String mensagem) {
+        this.receptor=receptor;
+        this.assunto=assunto;
+        this.mensagem=mensagem;
+    }
 
     public long getId() {
         return id;
