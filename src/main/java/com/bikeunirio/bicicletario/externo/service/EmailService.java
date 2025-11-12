@@ -6,11 +6,13 @@ import com.bikeunirio.bicicletario.externo.entity.Email;
 import com.bikeunirio.bicicletario.externo.mapper.EmailMapper;
 import com.bikeunirio.bicicletario.externo.repository.EmailRepository;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 @Service
 public class EmailService {
     private final EmailRepository emailRepository;
+    private JavaMailSender mailSender;
 
     public EmailService(EmailRepository emailRepository){
         this.emailRepository = emailRepository;
@@ -25,6 +27,8 @@ public class EmailService {
         email.setSubject(emailEntity.getAssunto());
         email.setTo(emailEntity.getReceptor());
         email.setFrom("emailexternoes2@gmail.com");
+        mailSender.send(email);
+
         //excecoes tratadas pelo @ControllerAdvice
         //aqui, só roda se o sistema não lançar nenhuma exceção
         // também deve salvar nos logs de envio
