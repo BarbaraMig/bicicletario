@@ -21,7 +21,7 @@ public class Cobranca{
     @Column(columnDefinition = "DATETIME")
     private LocalDateTime horaSolicitacao;
 
-    @GeneratedValue
+
     @Column(columnDefinition = "DATETIME")
     private LocalDateTime horaFinalizacao;
 
