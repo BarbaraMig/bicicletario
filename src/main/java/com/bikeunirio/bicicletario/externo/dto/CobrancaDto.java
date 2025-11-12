@@ -18,12 +18,7 @@ public class CobrancaDto {
 
     }
 
-    public CobrancaDto(long id,
-                       String idApi,
-                       StatusCobranca status,
-                       LocalDateTime horaSolicitacao,
-                       LocalDateTime horaFinalizacao,
-                       BigDecimal valor,
+    public CobrancaDto(long id, String idApi, StatusCobranca status, LocalDateTime horaSolicitacao, LocalDateTime horaFinalizacao, BigDecimal valor,
                        long idCiclista) {
         this.id = id;
         this.idApi = idApi;

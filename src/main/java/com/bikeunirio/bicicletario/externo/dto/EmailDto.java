@@ -7,7 +7,9 @@ public class EmailDto {
     private String receptor;
     private String assunto;
     private String mensagem;
-    private LocalDateTime horaEnvio;
+
+
+
 
     public long getId() {
         return id;
@@ -39,13 +41,5 @@ public class EmailDto {
 
     public void setMensagem(String mensagem) {
         this.mensagem = mensagem;
-    }
-
-    public LocalDateTime getHoraEnvio() {
-        return horaEnvio;
-    }
-
-    public void setHoraEnvio(LocalDateTime horaEnvio) {
-        this.horaEnvio = horaEnvio;
     }
 }

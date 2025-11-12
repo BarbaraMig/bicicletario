@@ -15,7 +15,7 @@ public class EmailMapper {
          dto.setReceptor(emailEntidade.getReceptor());
          dto.setAssunto(emailEntidade.getAssunto());
          dto.setMensagem(emailEntidade.getMensagem());
-         dto.setHoraEnvio(emailEntidade.getHoraEnvio());
+
          return dto;
      }
 
@@ -25,8 +25,7 @@ public class EmailMapper {
          return new Email(dto.getId(),
                  dto.getReceptor(),
                  dto.getAssunto(),
-                 dto.getMensagem(),
-                 dto.getHoraEnvio());
+                 dto.getMensagem());
      }
 
 }

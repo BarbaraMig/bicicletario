@@ -18,20 +18,14 @@ public class Email{
 
     private String mensagem;
 
-    @GeneratedValue
-    @Column(columnDefinition = "DATETIME")
-    private LocalDateTime horaEnvio;
-
     public Email(){
-
     }
 
-    public Email(long id, String receptor, String assunto, String mensagem, LocalDateTime horaEnvio) {
+    public Email(long id, String receptor, String assunto, String mensagem) {
         this.id=id;
         this.receptor=receptor;
         this.assunto=assunto;
         this.mensagem=mensagem;
-        this.horaEnvio=horaEnvio;
     }
 
     public long getId() {
@@ -66,11 +60,4 @@ public class Email{
         this.mensagem = mensagem;
     }
 
-    public LocalDateTime getHoraEnvio() {
-        return horaEnvio;
-    }
-
-    public void setHoraEnvio(LocalDateTime horaEnvio) {
-        this.horaEnvio = horaEnvio;
-    }
 }
