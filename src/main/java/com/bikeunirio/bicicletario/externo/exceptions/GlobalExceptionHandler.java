@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestControllerAdvice
-public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+public class GlobalExceptionHandler{
 
     //Exceptions do Email
     @ExceptionHandler(MethodArgumentNotValidException.class)
