@@ -24,7 +24,6 @@ public class EmailServiceTest {
     @Mock
     JavaMailSender mailSender;
 
-
     //Tudo dá certo
     @Test
     public void testEnviarEmailCerto(){
@@ -41,6 +40,7 @@ public class EmailServiceTest {
         //verifica se o mailSender só foi chamado uma vez
         verify(mailSender, times(1)).send(any(SimpleMailMessage.class));
     }
+
     //O email é inválido
     @Test
     public void testEnviarEmailInvalido(){

@@ -17,6 +17,8 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler{
+    private final String STATUS = "status";
+    private final String MESSAGE = "mensagem";
 
     //Exceptions do Email
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -36,16 +38,16 @@ public class GlobalExceptionHandler{
     public ResponseEntity<Map<String,Object>> handleObjetoNaoEncontrado(ObjectNotFoundException exception){
 
         Map<String, Object> corpoDoErro = new LinkedHashMap<>();
-        corpoDoErro.put("status", HttpStatus.NOT_FOUND.value());
-        corpoDoErro.put("message", exception.getMessage());
+        corpoDoErro.put(STATUS, HttpStatus.NOT_FOUND.value());
+        corpoDoErro.put(MESSAGE, exception.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(corpoDoErro);
     }
 
     @ExceptionHandler(MailException.class)
     public ResponseEntity<Map<String,Object>> handleMailException(MailException exception){
         Map<String, Object> corpoDoErro = new LinkedHashMap<>();
-        corpoDoErro.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
-        corpoDoErro.put("message", exception.getMessage());
+        corpoDoErro.put(STATUS, HttpStatus.INTERNAL_SERVER_ERROR.value());
+        corpoDoErro.put(MESSAGE, exception.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(corpoDoErro);
     }
 
@@ -53,8 +55,8 @@ public class GlobalExceptionHandler{
     @ExceptionHandler(MailParseException.class)
     public ResponseEntity<Map<String,Object>> handleMailException(MailParseException exception){
         Map<String, Object> corpoDoErro = new LinkedHashMap<>();
-        corpoDoErro.put("status", HttpStatus.UNPROCESSABLE_ENTITY.value());
-        corpoDoErro.put("message", exception.getMessage());
+        corpoDoErro.put(STATUS, HttpStatus.UNPROCESSABLE_ENTITY.value());
+        corpoDoErro.put(MESSAGE, exception.getMessage());
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(corpoDoErro);
     }
 
