@@ -3,8 +3,7 @@ name: Build and Analyze (SonarCloud)
 on:
   push:
     branches:
-      - dev
-      - branch-*
+      - main
   pull_request:
     types: [opened, synchronize, reopened]
 
