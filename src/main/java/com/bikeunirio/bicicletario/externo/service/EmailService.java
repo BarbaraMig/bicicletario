@@ -18,7 +18,7 @@ public class EmailService {
     }
 
 
-    public ResponseEntity<?> enviarEmail(EmailDto emailDto){
+    public ResponseEntity<EmailDto> enviarEmail(EmailDto emailDto){
         //construtor do SimpleMailMessage não recebe nenhum parâmetro
         SimpleMailMessage email = new SimpleMailMessage();
 
