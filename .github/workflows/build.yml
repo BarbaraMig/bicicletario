@@ -45,5 +45,5 @@ jobs:
             -Dsonar.projectKey=BarbaraMig_bicicletario \
             -Dsonar.organization=babimig \
             -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.token=${{secrets.SONAR_USER_TOKEN}} \
+            -Dsonar.token=${{secrets.SONAR_TOKEN}} \
             -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
