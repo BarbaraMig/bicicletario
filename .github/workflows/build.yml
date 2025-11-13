@@ -38,8 +38,7 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
 
       - name: Build and analyze with SonarCloud
-        env:
-          SONAR_TOKEN: 14e50200cb7faccb9d96afdece61696f493b55e6
         run: |
-          mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
-            -Dsonar.projectKey=BarbaraMig_bicicletario
+          mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar 
+          -Dsonar.projectKey=BarbaraMig_bicicletario \
+          -Dsonar.organization=babimig
