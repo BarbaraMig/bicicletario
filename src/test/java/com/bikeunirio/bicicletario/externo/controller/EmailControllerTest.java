@@ -5,70 +5,61 @@ import com.bikeunirio.bicicletario.externo.service.EmailService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ExtendWith(MockitoExtension.class)
+@WebMvcTest(EmailController.class)
 class EmailControllerTest {
 
+    @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
     private ObjectMapper objectMapper;
 
-    // 2. Cria um mock do serviço
-    @Mock
+    @MockBean
     private EmailService emailService;
-    @InjectMocks
-    private EmailController emailController;
 
     private EmailDto emailDto;
     private final String ENDPOINT = "/enviarEmail";
 
     @BeforeEach
     void setUp() {
-        // Inicializa o MockMvc com o controller injetado (sem a necessidade do @WebMvcTest)
-        mockMvc = MockMvcBuilders.standaloneSetup(emailController).build();
-        objectMapper = new ObjectMapper(); 
-        
+        // CORRIGIDO: Usando o construtor de 3 argumentos: (receptor, assunto, mensagem)
         emailDto = new EmailDto(
-            "remetente@teste.com", 
-            "destinatario@teste.com", 
-            "Assunto Teste", 
-            "Corpo da mensagem"
+            "destinatario@teste.com", // receptor
+            "Assunto Teste",          // assunto
+            "Corpo da mensagem"       // mensagem
         );
+        // O campo 'remetente' que estava no teste anterior foi removido.
     }
-
-    //-------------------------------------------------------------
 
     @Test
     void enviarEmail_DeveRetornar200EChamarServico() throws Exception {
-        // ARRANGE: Configura o mock do serviço.
-        // Como o método é void, usamos doNothing().
+        // ARRANGE
         doNothing().when(emailService).enviarEmail(any(EmailDto.class));
 
-        // ACT & ASSERT: Executa a requisição simulada e verifica
+        // ACT & ASSERT
         mockMvc.perform(post(ENDPOINT)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(emailDto)))
                 
                 // 1. Verifica o status HTTP
-                .andExpect(status().isOk()) // Espera 200 OK
+                .andExpect(status().isOk()) 
                 
-                // 2. Verifica se o JSON retornado (o próprio DTO) está correto
-                .andExpect(jsonPath("$.remetente").value(emailDto.getRemetente()))
+                // 2. CORRIGIDO: Usando getReceptor() em vez de getRemetente()
+                .andExpect(jsonPath("$.receptor").value(emailDto.getReceptor()))
                 .andExpect(jsonPath("$.assunto").value(emailDto.getAssunto()));
 
-        // 3. Verifica se o método do serviço (mock) foi realmente chamado UMA vez
+        // 3. Verifica se o método do serviço foi chamado
         verify(emailService, times(1)).enviarEmail(any(EmailDto.class));
     }
 }
