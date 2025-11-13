@@ -3,11 +3,12 @@ package com.bikeunirio.bicicletario.externo.controller;
 import com.bikeunirio.bicicletario.externo.dto.EmailDto;
 import com.bikeunirio.bicicletario.externo.service.EmailService;
 import org.junit.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.http.ResponseEntity;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-
+@ExtendWith(MockitoExtension.class)
 public class EmailControllerTest {
     @InjectMocks
     EmailController emailController;
@@ -15,21 +16,11 @@ public class EmailControllerTest {
     @Mock
     EmailService emailService;
 
-    //Tudo dá certo
     @Test
-    public void testEnviarEmailCerto(){
-        EmailDto dto = new EmailDto();
+    public void testEnviarEmail(){
+        EmailDto dto = new EmailDto("emailexternoes2@gmail.com","assunto","mensagem");
 
 
     }
-    //O email é inválido
-    @Test
-    public void testEnviarEmailErrado1(){
 
-    }
-    //O email não existe
-    @Test
-    public void testEnviarEmailErrado2(){
-
-    }
 }

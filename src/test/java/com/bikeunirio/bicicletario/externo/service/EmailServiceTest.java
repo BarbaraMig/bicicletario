@@ -2,8 +2,11 @@ package com.bikeunirio.bicicletario.externo.service;
 
 import com.bikeunirio.bicicletario.externo.dto.EmailDto;
 import org.junit.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailParseException;
@@ -13,6 +16,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 public class EmailServiceTest {
     @InjectMocks
     EmailService emailService;
