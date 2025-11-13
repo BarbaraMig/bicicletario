@@ -18,8 +18,9 @@ public class EmailController {
     }
 
     @PostMapping("/enviarEmail")
-    public ResponseEntity<?> enviarEmail(@RequestBody EmailDto email){
-        return ResponseEntity.ok(emailService.enviarEmail(email));
+    public ResponseEntity<EmailDto> enviarEmail(@RequestBody EmailDto email){
+        emailService.enviarEmail(email);
+        return ResponseEntity.ok(email);
     }
 
 }

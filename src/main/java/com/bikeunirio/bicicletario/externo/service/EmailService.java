@@ -10,8 +10,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class EmailService {
 
-    private JavaMailSender mailSender;
-    private final String emailRemetente = "emailexternoes2@gmail.com";
+    private final JavaMailSender mailSender;
 
     public EmailService( JavaMailSender mailSender){
         this.mailSender = mailSender;
@@ -25,7 +24,7 @@ public class EmailService {
         email.setText(emailDto.getMensagem());
         email.setSubject(emailDto.getAssunto());
         email.setTo(emailDto.getReceptor());
-        email.setFrom(emailRemetente);
+        email.setFrom("emailexternoes2@gmail.com");
         mailSender.send(email);
         //exceções são tratadas pelo Global Handler
 
