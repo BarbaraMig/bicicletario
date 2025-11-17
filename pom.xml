@@ -21,6 +21,7 @@
 		<sonar.organization>babimig</sonar.organization>
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 		<sonar.projectKey>BarbaraMig_bicicletario</sonar.projectKey>
+		<sonar.coverage.jacoco.xmlReportPath>target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPath>
 	</properties>
 
 	<dependencies>
@@ -53,6 +54,12 @@
 			<version>5.17.0</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.13.2</version>
+			<scope>test</scope>
+		</dependency>
 		<!-- Enviar email -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -69,7 +76,7 @@
 	</dependencies>
 	
 	<build>
-		<finalName>${project.name}</finalName>
+		<finalName>externo</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
@@ -79,19 +86,26 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.8.14</version>
+				<version>0.8.14</version> <!-- Use a versão que você já tem -->
 				<executions>
 					<execution>
+						<id>prepare-agent</id>
 						<goals>
 							<goal>prepare-agent</goal>
 						</goals>
 					</execution>
 					<execution>
 						<id>report</id>
-						<phase>verify</phase>
+						<phase>test</phase> <!-- Executar após os testes -->
 						<goals>
 							<goal>report</goal>
 						</goals>
+						<!-- A configuração abaixo GARANTE que o XML seja criado -->
+						<configuration>
+							<formats>
+								<format>XML</format>
+							</formats>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>

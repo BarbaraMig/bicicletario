@@ -2,7 +2,6 @@ package com.bikeunirio.bicicletario.externo.service;
 
 
 import com.bikeunirio.bicicletario.externo.dto.EmailDto;
-import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -17,7 +16,7 @@ public class EmailService {
     }
 
 
-    public ResponseEntity<EmailDto> enviarEmail(EmailDto emailDto){
+    public void enviarEmail(EmailDto emailDto){
         //construtor do SimpleMailMessage não recebe nenhum parâmetro
         SimpleMailMessage email = new SimpleMailMessage();
 
@@ -27,7 +26,5 @@ public class EmailService {
         email.setFrom("emailexternoes2@gmail.com");
         mailSender.send(email);
         //exceções são tratadas pelo Global Handler
-
-        return ResponseEntity.ok(emailDto);
     }
 }
