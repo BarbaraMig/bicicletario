@@ -1,38 +1,34 @@
-package com.bikeunirio.bicicletario.externo.zmudancas.service;
+package com.bikeunirio.bicicletario.externo.service;
 
-import com.bikeunirio.bicicletario.externo.zmudancas.dto.CartaoDto;
-import com.bikeunirio.bicicletario.externo.zmudancas.dto.CobrancaDto;
-import com.bikeunirio.bicicletario.externo.zmudancas.dto.PedidoCobrancaDto;
-import com.bikeunirio.bicicletario.externo.zmudancas.dto.RespostaDto;
-import com.bikeunirio.bicicletario.externo.zmudancas.entity.Cobranca;
-import com.bikeunirio.bicicletario.externo.zmudancas.mapper.CobrancaMapper;
-import com.bikeunirio.bicicletario.externo.zmudancas.repository.CobrancaRepository;
-import org.springframework.cglib.core.Local;
+import com.bikeunirio.bicicletario.externo.dto.CartaoDto;
+import com.bikeunirio.bicicletario.externo.dto.CobrancaDto;
+import com.bikeunirio.bicicletario.externo.dto.PedidoCobrancaDto;
+import com.bikeunirio.bicicletario.externo.dto.RespostaErroDto;
+import com.bikeunirio.bicicletario.externo.entity.Cobranca;
+import com.bikeunirio.bicicletario.externo.mapper.CobrancaMapper;
+import com.bikeunirio.bicicletario.externo.repository.CobrancaRepository;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class CobrancaService {
     private final PaypalAutenticacao paypalAutenticacao;
     private final WebClient paypalWebClient;
     private final CobrancaRepository cobrancaRepository;
-    private final List<Cobranca> filaCobranca;
+    private final List<Cobranca> filaCobrancaAtrasada;
     private final CobrancaMapper mapper;
 
-    public CobrancaService(PaypalAutenticacao paypalAutenticacao, WebClient paypalWebClient, CobrancaRepository cobrancaRepository, List<Cobranca> Cobranca, CobrancaMapper mapper) {
+    public CobrancaService(PaypalAutenticacao paypalAutenticacao, WebClient paypalWebClient, CobrancaRepository cobrancaRepository, List<Cobranca> filaCobrancaAtrasada, CobrancaMapper mapper) {
         this.paypalAutenticacao = paypalAutenticacao;
         this.paypalWebClient = paypalWebClient;
         this.cobrancaRepository = cobrancaRepository;
         this.mapper = mapper;
-        this.filaCobranca = new ArrayList<>();
+        this.filaCobrancaAtrasada = new ArrayList<>();
     }
 
 
@@ -58,23 +54,21 @@ public class CobrancaService {
                                                 "currency_code", "USD",
                                                 "value", String.format("%.2f", valorCompra)
                                         )
-                                )))).retrieve().bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {}).block();
+                                )))).retrieve().bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
+                //requisição bloqueante
+                .block();
 
-
-        cobrancaDto.setStatus((String)retornoApi.get("status"));
+        //podia dar nullPointerEx então "se for null ele define como null, caso não seja pega o status"
+        cobrancaDto.setStatus((String) (retornoApi != null ? retornoApi.get("status") : null));
+        cobrancaDto.setIdApi(retornoApi != null ? retornoApi.get("id").toString() : null);
         cobrancaRepository.save(mapper.toEntity(cobrancaDto));
         cobrancaDto.setHoraFinalizacao(LocalDateTime.now(ZoneId.of("America/Sao_Paulo")));
         return cobrancaDto;
-        /*
-        deve fazer o pedido de um token (PaypalAutenticacao.getTokenAutenticacao)
-        fazer a requisicao da cobranca em si, utilizando o token no tipo bearer auth
-        receber
-        */
 
     }
 
     public Optional<CobrancaDto> obterCobranca(long id){
-        //Optional não permite retornar null mas pode retornar um objeto vazio
+        //Optional não permite retornar null, mas pode retornar um objeto vazio
         //ele passa as inforamções do Optional para um dto
         return cobrancaRepository.findById(id)
                 .map(entidade -> {
@@ -91,26 +85,31 @@ public class CobrancaService {
     }
 
 
-    public RespostaDto validarCartaoCredito(CartaoDto cartaoDto){
+    public RespostaErroDto validarCartaoCredito(CartaoDto cartaoDto){
         //pegar quais atributos do cartão para chamar o pedido de cobrança?
         //chamar o realizarCobranca para fazer a validação (cobrança de 1 centavo)
-        //realizarCobranca();
+        //realizar Cobranca
 
         return null;
     }
 
-    public void incluirCobrancaNaFila(CobrancaDto cobrancaDto) {
-        //salva na fila;
-        filaCobranca.add(mapper.toEntity(cobrancaDto));
-
+    public CobrancaDto incluirCobrancaNaFila(PedidoCobrancaDto pedidoCobrancaDto) {
+        return null;
     }
 
-    public void processaCobrancasEmFila(List<Cobranca> filaCobrancaAtrasada) {
-
+    public List<CobrancaDto> processaCobrancasEmFila() {
+        PedidoCobrancaDto pedidoCobrancaDto = new PedidoCobrancaDto();
+        List<CobrancaDto> listaPedidosCobrados = new ArrayList<>();
         for(Cobranca cobranca : filaCobrancaAtrasada){
-        //realizarCobrança
+            pedidoCobrancaDto.setValor(cobranca.getValor());
+            pedidoCobrancaDto.setIdCiclista(cobranca.getIdCiclista());
+            realizarCobranca(pedidoCobrancaDto);
+            //assim que faz a cobrança, ele retira da fila de atrasados
+            filaCobrancaAtrasada.remove(cobranca);
+            //adiciona o retorno de cobranca em uma lista que vai ser retornada ao controller
+            listaPedidosCobrados.add(realizarCobranca(pedidoCobrancaDto));
         //trocar o status para paga
         }
-
+        return listaPedidosCobrados;
     }
 }

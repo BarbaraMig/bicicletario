@@ -1,9 +1,19 @@
-package com.bikeunirio.bicicletario.externo.zmudancas.dto;
+package com.bikeunirio.bicicletario.externo.dto;
 
 import java.time.LocalDateTime;
 
 public class CobrancaDto {
     private Long idCobranca;
+    private String idApi;
+
+    public String getIdApi() {
+        return idApi;
+    }
+
+    public void setIdApi(String idApi) {
+        this.idApi = idApi;
+    }
+
     private String status;
     private LocalDateTime horaSolicitacao;
     private LocalDateTime horaFinalizacao;

@@ -1,12 +1,12 @@
 package com.bikeunirio.bicicletario.externo;
 
-import com.bikeunirio.bicicletario.externo.zmudancas.controller.CobrancaController;
-import com.bikeunirio.bicicletario.externo.zmudancas.dto.CartaoDto;
-import com.bikeunirio.bicicletario.externo.zmudancas.dto.CobrancaDto;
-import com.bikeunirio.bicicletario.externo.zmudancas.dto.PedidoCobrancaDto;
-import com.bikeunirio.bicicletario.externo.zmudancas.dto.RespostaDto;
-import com.bikeunirio.bicicletario.externo.zmudancas.mapper.CobrancaMapper;
-import com.bikeunirio.bicicletario.externo.zmudancas.service.CobrancaService;
+import com.bikeunirio.bicicletario.externo.controller.CobrancaController;
+import com.bikeunirio.bicicletario.externo.dto.CartaoDto;
+import com.bikeunirio.bicicletario.externo.dto.CobrancaDto;
+import com.bikeunirio.bicicletario.externo.dto.PedidoCobrancaDto;
+import com.bikeunirio.bicicletario.externo.dto.RespostaErroDto;
+import com.bikeunirio.bicicletario.externo.mapper.CobrancaMapper;
+import com.bikeunirio.bicicletario.externo.service.CobrancaService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -97,8 +97,8 @@ class CobrancaControllerTest {
     @Test
     void testValidarCartaoCredito_Sucesso() throws Exception {
         CartaoDto cartao = new CartaoDto();
-        RespostaDto resposta = new RespostaDto();
-        resposta.setStatus("200");
+        RespostaErroDto resposta = new RespostaErroDto();
+        resposta.setStatus(200);
 
         when(cobrancaService.validarCartaoCredito(any(CartaoDto.class))).thenReturn(resposta);
 

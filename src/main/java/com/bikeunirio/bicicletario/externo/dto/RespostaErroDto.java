@@ -1,20 +1,20 @@
-package com.bikeunirio.bicicletario.externo.zmudancas.dto;
+package com.bikeunirio.bicicletario.externo.dto;
 
-public class RespostaDto {
-    private String status;
+public class RespostaErroDto {
+    private Integer status;
     private String message;
 
-    public RespostaDto(){}
-    RespostaDto(String status, String message){
+    public RespostaErroDto(){}
+    public RespostaErroDto(Integer status, String message){
         this.status=status;
         this.message=message;
     }
 
-    public String getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 

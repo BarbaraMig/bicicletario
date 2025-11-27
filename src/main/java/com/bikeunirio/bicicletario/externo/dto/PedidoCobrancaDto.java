@@ -1,4 +1,4 @@
-package com.bikeunirio.bicicletario.externo.zmudancas.dto;
+package com.bikeunirio.bicicletario.externo.dto;
 
 public class PedidoCobrancaDto {
     //Informações necessárias para o pedido, passadas pelo microsserviço Aluguel

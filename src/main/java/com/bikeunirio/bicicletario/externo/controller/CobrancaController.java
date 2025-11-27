@@ -1,17 +1,14 @@
-package com.bikeunirio.bicicletario.externo.zmudancas.controller;
+package com.bikeunirio.bicicletario.externo.controller;
 
-import com.bikeunirio.bicicletario.externo.zmudancas.dto.CartaoDto;
-import com.bikeunirio.bicicletario.externo.zmudancas.dto.CobrancaDto;
-import com.bikeunirio.bicicletario.externo.zmudancas.dto.PedidoCobrancaDto;
-import com.bikeunirio.bicicletario.externo.zmudancas.dto.RespostaDto;
-import com.bikeunirio.bicicletario.externo.zmudancas.entity.Cobranca;
-import com.bikeunirio.bicicletario.externo.zmudancas.mapper.CobrancaMapper;
-import com.bikeunirio.bicicletario.externo.zmudancas.service.CobrancaService;
+import com.bikeunirio.bicicletario.externo.dto.CartaoDto;
+import com.bikeunirio.bicicletario.externo.dto.CobrancaDto;
+import com.bikeunirio.bicicletario.externo.dto.PedidoCobrancaDto;
+import com.bikeunirio.bicicletario.externo.dto.RespostaErroDto;
+import com.bikeunirio.bicicletario.externo.service.CobrancaService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Objects;
-import java.util.Optional;
+import java.util.List;
 
 @RestController
 public class CobrancaController {
@@ -19,11 +16,9 @@ public class CobrancaController {
 
 
     private final CobrancaService cobrancaService;
-    private final CobrancaMapper cobrancaMapper;
 
-    CobrancaController(CobrancaService cobrancaService, CobrancaMapper cobrancaMapper){
+    CobrancaController(CobrancaService cobrancaService){
         this.cobrancaService=cobrancaService;
-        this.cobrancaMapper = cobrancaMapper;
     }
 
     //finalizado
@@ -45,12 +40,22 @@ public class CobrancaController {
 
     @PostMapping("/validarCartaoCredito")
     public ResponseEntity<String> validarCartaoCredito(@RequestBody CartaoDto cartao){
-        RespostaDto resposta = cobrancaService.validarCartaoCredito(cartao);
+        RespostaErroDto resposta = cobrancaService.validarCartaoCredito(cartao);
 
-        if(resposta.getStatus().equals("200"))
+        if(resposta.getStatus() == 200)
             return ResponseEntity.ok().body(resposta.toString());
         //ta certo chamar o toString assim???
         return ResponseEntity.ok("validacao");
+    }
+
+    @PostMapping("/filaCobranca")
+    public ResponseEntity<CobrancaDto> incluirCobrancaNaFila(@RequestBody PedidoCobrancaDto pedidoCobrancaDto){
+        return ResponseEntity.ok(cobrancaService.incluirCobrancaNaFila(pedidoCobrancaDto));
+    }
+
+    @PostMapping("/processaCobrancasEmFila")
+    public ResponseEntity<List<CobrancaDto>> processaCobrancasEmFila(){
+        return ResponseEntity.ok(cobrancaService.processaCobrancasEmFila());
     }
 
 
