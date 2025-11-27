@@ -94,7 +94,17 @@ public class CobrancaService {
     }
 
     public CobrancaDto incluirCobrancaNaFila(PedidoCobrancaDto pedidoCobrancaDto) {
-        return null;
+        // Converte o pedido em uma entidade Cobranca para salvar na fila
+        Cobranca cobranca = new Cobranca();
+        cobranca.setValor(pedidoCobrancaDto.getValor());
+        cobranca.setIdCiclista(pedidoCobrancaDto.getIdCiclista());
+        cobranca.setHoraSolicitacao(LocalDateTime.now(ZoneId.of("America/Sao_Paulo")));
+        cobranca.setStatus("NA_FILA"); // Define um status provisório
+
+        // Adiciona na lista em memória
+        filaCobrancaAtrasada.add(cobranca);
+        // Retorna um DTO representando que foi agendado
+        return mapper.toDTO(cobranca);
     }
 
     public List<CobrancaDto> processaCobrancasEmFila() {
@@ -103,11 +113,11 @@ public class CobrancaService {
         for(Cobranca cobranca : filaCobrancaAtrasada){
             pedidoCobrancaDto.setValor(cobranca.getValor());
             pedidoCobrancaDto.setIdCiclista(cobranca.getIdCiclista());
-            realizarCobranca(pedidoCobrancaDto);
+            CobrancaDto cobrancaDto = realizarCobranca(pedidoCobrancaDto);
             //assim que faz a cobrança, ele retira da fila de atrasados
             filaCobrancaAtrasada.remove(cobranca);
             //adiciona o retorno de cobranca em uma lista que vai ser retornada ao controller
-            listaPedidosCobrados.add(realizarCobranca(pedidoCobrancaDto));
+            listaPedidosCobrados.add(cobrancaDto);
         //trocar o status para paga
         }
         return listaPedidosCobrados;

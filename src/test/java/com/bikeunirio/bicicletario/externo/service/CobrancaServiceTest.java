@@ -1,12 +1,10 @@
-package com.bikeunirio.bicicletario.externo;
+package com.bikeunirio.bicicletario.externo.service;
 
 import com.bikeunirio.bicicletario.externo.dto.CobrancaDto;
 import com.bikeunirio.bicicletario.externo.dto.PedidoCobrancaDto;
 import com.bikeunirio.bicicletario.externo.entity.Cobranca;
 import com.bikeunirio.bicicletario.externo.mapper.CobrancaMapper;
 import com.bikeunirio.bicicletario.externo.repository.CobrancaRepository;
-import com.bikeunirio.bicicletario.externo.service.CobrancaService;
-import com.bikeunirio.bicicletario.externo.service.PaypalAutenticacao;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -72,6 +70,15 @@ class CobrancaServiceTest {
         assertTrue(resultado.isPresent());
         assertEquals(200L, resultado.get().getIdCobranca());
         assertEquals(200F, resultado.get().getValorCobranca());
+    }
+
+    @Test
+    void obterCobranca_NaoEncontrado() {
+        when(cobrancaRepository.findById(999L)).thenReturn(Optional.empty());
+
+        Optional<CobrancaDto> resultado = cobrancaService.obterCobranca(999L);
+
+        assertTrue(resultado.isEmpty());
     }
 
     @Test
