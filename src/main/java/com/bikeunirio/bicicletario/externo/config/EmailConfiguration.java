@@ -1,4 +1,4 @@
-package com.bikeunirio.bicicletario.externo;
+package com.bikeunirio.bicicletario.externo.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.mail.javamail.JavaMailSender;
