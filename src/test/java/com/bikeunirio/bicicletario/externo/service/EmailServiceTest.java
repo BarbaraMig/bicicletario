@@ -39,22 +39,19 @@ class EmailServiceTest {
         verify(mailSender, times(1)).send(any(SimpleMailMessage.class));
     }
 
-    // Teste 2: O email é inválido (lança MailParseException)
     @Test
-    void testEnviarEmailInvalido() {
-        EmailDto dto = new EmailDto("receptor", "assunto", "mensagem");
+    void testEnviarEmailInvalidoBarrado() {
+        // email inválido
+        EmailDto dto = new EmailDto("receptor_sem_arroba", "assunto", "mensagem");
 
-        // Mock do mailSender para LANÇAR a exceção
-        doThrow(new MailParseException("Erro de parse")).when(mailSender).send(any(SimpleMailMessage.class));
+        //o código nem deve chegar ao mailSender
+        boolean resultado = emailService.enviarEmail(dto);
 
-        // O teste correto é verificar se a exceção é lançada pelo serviço
-        MailParseException exception = assertThrows(MailParseException.class, () -> {
-            emailService.enviarEmail(dto);
-        });
+        // verificar se retornou false
+        assertFalse(resultado, "O método deve retornar false quando o email for inválido");
 
-        // Verificações adicionais (opcional)
-        assertEquals("Erro de parse", exception.getMessage());
-        verify(mailSender, times(1)).send(any(SimpleMailMessage.class));
+        //se a validação barrou a chamada, o mailSender nunca foi chamado
+        verify(mailSender, never()).send(any(SimpleMailMessage.class));
     }
 
     // Teste 3: Outro erro de email (lança MailException)

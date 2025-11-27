@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface CobrancaLogsRepository extends JpaRepository<Cobranca, Long> {
+public interface CobrancaRepository extends JpaRepository<Cobranca, Long> {
 }

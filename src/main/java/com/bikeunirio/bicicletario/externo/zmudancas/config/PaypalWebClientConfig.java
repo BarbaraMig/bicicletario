@@ -1,4 +1,4 @@
-package com.bikeunirio.bicicletario.externo.zmudancas;
+package com.bikeunirio.bicicletario.externo.zmudancas.config;
 
 import io.netty.channel.ChannelOption;
 import org.springframework.context.annotation.Bean;

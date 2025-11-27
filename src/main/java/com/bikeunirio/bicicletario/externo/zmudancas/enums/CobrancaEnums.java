@@ -1,4 +1,8 @@
 package com.bikeunirio.bicicletario.externo.zmudancas.enums;
 
-public class CobrancaEnums {
+public enum CobrancaEnums {
+    PENDENTE,
+    PAGA,
+    FALHA,
+    CANCELADA
 }
