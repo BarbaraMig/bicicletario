@@ -1,7 +1,6 @@
 package com.bikeunirio.bicicletario.externo.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
 
 import java.time.LocalDateTime;
 
