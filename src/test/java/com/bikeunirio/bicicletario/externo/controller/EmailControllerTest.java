@@ -9,13 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import com.bikeunirio.bicicletario.externo.controller.EmailController;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.mail.MailException;
@@ -33,13 +27,15 @@ class EmailControllerTest {
 
     private MockMvc mockMvc;
 
-    private ObjectMapper objectMapper;
-    private EmailController emailController;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Mock
     private EmailService emailService;
+
     @BeforeEach
     void setup(){
+        EmailController emailController = new EmailController(emailService);
+
         mockMvc = MockMvcBuilders.standaloneSetup(emailController)
                 // registra o tratador de exceções manualmente
                 .setControllerAdvice(new GlobalExceptionHandler())
@@ -51,8 +47,9 @@ class EmailControllerTest {
     void testEnviarEmail_Sucesso() throws Exception {
         EmailDto dto = new EmailDto("emailexternoes2@gmail.com", "assunto", "mensagem");
 
-        // Quando o serviço for chamado, não faça nada
-        doNothing().when(emailService).enviarEmail(dto);
+        //enviar email retorna boolean
+        when(emailService.enviarEmail(any(EmailDto.class))).thenReturn(true);
+
 
         // Simula a chamada POST para /enviarEmail
         mockMvc.perform(post("/enviarEmail")
@@ -78,7 +75,7 @@ class EmailControllerTest {
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isUnprocessableEntity()) // Espera status 422
                 .andExpect(jsonPath("$.status").value(422)) // Verifica o corpo do erro
-                .andExpect(jsonPath("$.mensagem").value("Email inválido"));
+                .andExpect(jsonPath("$.message").value("Email inválido"));
     }
 
     // MailException (http 500)
@@ -96,6 +93,6 @@ class EmailControllerTest {
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isInternalServerError()) // Espera status 500
                 .andExpect(jsonPath("$.status").value(500)) // Verifica o corpo do erro
-                .andExpect(jsonPath("$.mensagem").value("Erro de servidor de email"));
+                .andExpect(jsonPath("$.message").value("Erro de servidor de email"));
     }
 }

@@ -1,39 +1,10 @@
-package com.bikeunirio.bicicletario.externo.zmudancas.entity;
-
-import jakarta.persistence.*;
+package com.bikeunirio.bicicletario.externo.dto;
 
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name="cobrancas")
-public class Cobranca{
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-
+public class CobrancaDto {
+    private Long idCobranca;
     private String idApi;
-
-    private String status;
-
-    @Column(columnDefinition = "DATETIME")
-    private LocalDateTime horaSolicitacao;
-
-    @GeneratedValue
-    @Column(columnDefinition = "DATETIME")
-    private LocalDateTime horaFinalizacao;
-
-    private Float valor;
-
-    private long idCiclista;
-
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
 
     public String getIdApi() {
         return idApi;
@@ -41,6 +12,20 @@ public class Cobranca{
 
     public void setIdApi(String idApi) {
         this.idApi = idApi;
+    }
+
+    private String status;
+    private LocalDateTime horaSolicitacao;
+    private LocalDateTime horaFinalizacao;
+    private Float valorCobranca;
+    private Long idCiclista;
+
+    public Long getIdCobranca() {
+        return idCobranca;
+    }
+
+    public void setIdCobranca(Long idCobranca) {
+        this.idCobranca = idCobranca;
     }
 
     public String getStatus() {
@@ -67,19 +52,19 @@ public class Cobranca{
         this.horaFinalizacao = horaFinalizacao;
     }
 
-    public Float getValor() {
-        return valor;
+    public Float getValorCobranca() {
+        return valorCobranca;
     }
 
-    public void setValor(Float valor) {
-        this.valor = valor;
+    public void setValorCobranca(Float valorCobranca) {
+        this.valorCobranca = valorCobranca;
     }
 
-    public long getIdCiclista() {
+    public Long getIdCiclista() {
         return idCiclista;
     }
 
-    public void setIdCiclista(long idCiclista) {
+    public void setIdCiclista(Long idCiclista) {
         this.idCiclista = idCiclista;
     }
 }

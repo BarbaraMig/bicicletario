@@ -1,10 +1,8 @@
-package com.bikeunirio.bicicletario.externo.zmudancas.mapper;
+package com.bikeunirio.bicicletario.externo.mapper;
 
-import com.bikeunirio.bicicletario.externo.zmudancas.dto.CobrancaDto;
-import com.bikeunirio.bicicletario.externo.zmudancas.entity.Cobranca;
+import com.bikeunirio.bicicletario.externo.dto.CobrancaDto;
+import com.bikeunirio.bicicletario.externo.entity.Cobranca;
 import org.springframework.stereotype.Component;
-
-import java.time.LocalDateTime;
 
 @Component
 public class CobrancaMapper {

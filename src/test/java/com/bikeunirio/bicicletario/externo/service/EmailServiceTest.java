@@ -1,13 +1,12 @@
 package com.bikeunirio.bicicletario.externo.service;
 
 import com.bikeunirio.bicicletario.externo.dto.EmailDto;
-import org.junit.jupiter.api.Test; // Import do JUnit 5
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mail.MailException;
-import org.springframework.mail.MailParseException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 

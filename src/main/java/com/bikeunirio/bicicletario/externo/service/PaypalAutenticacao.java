@@ -1,7 +1,6 @@
-package com.bikeunirio.bicicletario.externo.zmudancas.service;
+package com.bikeunirio.bicicletario.externo.service;
 
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -19,19 +18,13 @@ public class PaypalAutenticacao {
     private Instant expiracao;
     private String tokenAuth;
 
-    @Value("${paypal_client_id}")
-    private final String clientId = System.getenv("PAYPAL_CLIENT_ID");
-
-    @Value("${paypal_secret}")
-    private final String secret = System.getenv("PAYPAL_SECRET");
-
     public PaypalAutenticacao(WebClient webClient) {
         this.webClient = webClient;
     }
 
     private String auth(){
-        final String clientId = "${PAYPAL_CLIENT_ID}";
-        final String secret = "${PAYPAL_SECRET}";
+        String secret = "${PAYPAL_SECRET}";
+        String clientId = "${PAYPAL_CLIENT_ID}";
         String auth = clientId + ":" + secret;
         return "Basic " + Base64.getEncoder().encodeToString(auth.getBytes());
     }
@@ -53,9 +46,12 @@ public class PaypalAutenticacao {
                 .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
                 //block esperar a resposta de forma bloqueante
                 .block();
-
         //pega o valor do access_token
-        tokenAuth = (String) respostaRequisicao.get("access_token");
+        if(respostaRequisicao.get("access_token") != null)
+            tokenAuth = (String) respostaRequisicao.get("access_token");
+        else
+            tokenAuth = null;
+
         //pega o valor do expires_in -> tempo em segundos que leva para o token expirar
         Integer expiracaoSegundos = (Integer) respostaRequisicao.get("expires_in");
 

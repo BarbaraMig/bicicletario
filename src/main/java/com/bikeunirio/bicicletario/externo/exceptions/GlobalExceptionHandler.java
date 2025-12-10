@@ -1,35 +1,52 @@
 package com.bikeunirio.bicicletario.externo.exceptions;
 
+import com.bikeunirio.bicicletario.externo.dto.RespostaErroDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailParseException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import org.springframework.web.client.HttpClientErrorException;
+
+
 
 @RestControllerAdvice
 public class GlobalExceptionHandler{
-    private static final String STATUS = "status";
-    private static final String MESSAGE = "mensagem";
-
 
     @ExceptionHandler(MailException.class)
-    public ResponseEntity<Map<String,Object>> handleMailException(MailException exception){
-        Map<String, Object> corpoDoErro = new LinkedHashMap<>();
-        corpoDoErro.put(STATUS, HttpStatus.INTERNAL_SERVER_ERROR.value());
-        corpoDoErro.put(MESSAGE, exception.getMessage());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(corpoDoErro);
+    public ResponseEntity<RespostaErroDto> handleMailException(MailException exception){
+        RespostaErroDto respostaDto = new RespostaErroDto(HttpStatus.INTERNAL_SERVER_ERROR.value(), exception.getMessage());
+
+        return ResponseEntity.status(respostaDto.getStatus()).body(respostaDto);
     }
 
 
     @ExceptionHandler(MailParseException.class)
-    public ResponseEntity<Map<String,Object>> handleMailException(MailParseException exception){
-        Map<String, Object> corpoDoErro = new LinkedHashMap<>();
-        corpoDoErro.put(STATUS, HttpStatus.UNPROCESSABLE_ENTITY.value());
-        corpoDoErro.put(MESSAGE, exception.getMessage());
-        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(corpoDoErro);
+    public ResponseEntity<RespostaErroDto> handleMailException(MailParseException exception){
+        RespostaErroDto respostaDto = new RespostaErroDto(HttpStatus.UNPROCESSABLE_ENTITY.value(),exception.getMessage());
+
+        return ResponseEntity.status(respostaDto.getStatus()).body(respostaDto);
+    }
+
+    @ExceptionHandler(HttpClientErrorException.UnprocessableEntity.class)
+    public ResponseEntity<RespostaErroDto> handleUnprocessableEntity(HttpClientErrorException.UnprocessableEntity exception){
+        RespostaErroDto respostaDto = new RespostaErroDto(HttpStatus.UNPROCESSABLE_ENTITY.value(),exception.getMessage());
+
+        return ResponseEntity.status(respostaDto.getStatus()).body(respostaDto);
+    }
+
+    @ExceptionHandler(HttpClientErrorException.NotFound.class)
+    public ResponseEntity<RespostaErroDto> handleNotFound(HttpClientErrorException.NotFound exception){
+        RespostaErroDto respostaDto = new RespostaErroDto(HttpStatus.NOT_FOUND.value(),exception.getMessage());
+
+        return ResponseEntity.status(respostaDto.getStatus()).body(respostaDto);
+    }
+    @ExceptionHandler(NullPointerException.class)
+    public ResponseEntity<RespostaErroDto> handleNullPointerException(NullPointerException exception){
+        RespostaErroDto respostaDto = new RespostaErroDto(HttpStatus.INTERNAL_SERVER_ERROR.value(), exception.getMessage());
+
+        return ResponseEntity.status(respostaDto.getStatus()).body(respostaDto);
     }
 
 }

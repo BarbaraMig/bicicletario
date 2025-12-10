@@ -1,4 +1,4 @@
-package com.bikeunirio.bicicletario.externo.zmudancas.dto;
+package com.bikeunirio.bicicletario.externo.dto;
 
 import java.time.LocalDate;
 

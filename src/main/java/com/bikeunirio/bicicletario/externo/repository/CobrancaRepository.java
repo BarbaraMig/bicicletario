@@ -1,6 +1,6 @@
-package com.bikeunirio.bicicletario.externo.zmudancas.repository;
+package com.bikeunirio.bicicletario.externo.repository;
 
-import com.bikeunirio.bicicletario.externo.zmudancas.entity.Cobranca;
+import com.bikeunirio.bicicletario.externo.entity.Cobranca;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
