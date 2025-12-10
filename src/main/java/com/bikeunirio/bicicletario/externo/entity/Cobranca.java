@@ -1,11 +1,13 @@
 package com.bikeunirio.bicicletario.externo.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name="cobrancas")
+@Data
 public class Cobranca{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,60 +28,4 @@ public class Cobranca{
 
     private long idCiclista;
 
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getIdApi() {
-        return idApi;
-    }
-
-    public void setIdApi(String idApi) {
-        this.idApi = idApi;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public LocalDateTime getHoraSolicitacao() {
-        return horaSolicitacao;
-    }
-
-    public void setHoraSolicitacao(LocalDateTime horaSolicitacao) {
-        this.horaSolicitacao = horaSolicitacao;
-    }
-
-    public LocalDateTime getHoraFinalizacao() {
-        return horaFinalizacao;
-    }
-
-    public void setHoraFinalizacao(LocalDateTime horaFinalizacao) {
-        this.horaFinalizacao = horaFinalizacao;
-    }
-
-    public Float getValor() {
-        return valor;
-    }
-
-    public void setValor(Float valor) {
-        this.valor = valor;
-    }
-
-    public long getIdCiclista() {
-        return idCiclista;
-    }
-
-    public void setIdCiclista(long idCiclista) {
-        this.idCiclista = idCiclista;
-    }
 }
