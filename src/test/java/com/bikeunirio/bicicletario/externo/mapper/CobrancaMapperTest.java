@@ -16,7 +16,6 @@ class CobrancaMapperTest {
     private final CobrancaMapper mapper = new CobrancaMapper();
 
     @Test
-    @DisplayName("Deve converter Entity para DTO corretamente com todos os campos preenchidos")
     void deveConverterEntityParaDtoComSucesso() {
         // 1. Cenário (Arrange)
         Cobranca entity = new Cobranca();
@@ -41,14 +40,12 @@ class CobrancaMapperTest {
     }
 
     @Test
-    @DisplayName("Deve retornar null quando a Entity de entrada for null")
     void deveRetornarNullQuandoEntityForNull() {
         CobrancaDto resultado = mapper.toDTO(null);
         assertNull(resultado);
     }
 
     @Test
-    @DisplayName("Deve converter DTO para Entity corretamente com todos os campos preenchidos")
     void deveConverterDtoParaEntityComSucesso() {
         // 1. Cenário (Arrange)
         CobrancaDto dto = new CobrancaDto();
@@ -73,7 +70,6 @@ class CobrancaMapperTest {
     }
 
     @Test
-    @DisplayName("Deve retornar null quando o DTO de entrada for null")
     void deveRetornarNullQuandoDtoForNull() {
         Cobranca resultado = mapper.toEntity(null);
         assertNull(resultado);

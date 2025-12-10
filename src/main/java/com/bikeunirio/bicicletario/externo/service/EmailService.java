@@ -35,7 +35,7 @@ public class EmailService {
     }
     //validação do email
     private boolean validarFormatoEmail(String emailAddress) {
-        return Pattern.compile("^(.+)@(\\S+)$")
+        return Pattern.compile("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")
                 .matcher(emailAddress)
                 .matches();
     }

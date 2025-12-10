@@ -90,7 +90,7 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.8.14</version> <!-- Use a versão que você já tem -->
+				<version>0.8.14</version>
 				<executions>
 					<execution>
 						<id>prepare-agent</id>
@@ -100,11 +100,10 @@
 					</execution>
 					<execution>
 						<id>report</id>
-						<phase>test</phase> <!-- Executar após os testes -->
+						<phase>test</phase>
 						<goals>
 							<goal>report</goal>
 						</goals>
-						<!-- A configuração abaixo GARANTE que o XML seja criado -->
 						<configuration>
 							<formats>
 								<format>XML</format>

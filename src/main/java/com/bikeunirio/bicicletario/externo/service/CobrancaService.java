@@ -52,18 +52,11 @@ public class CobrancaService {
 
     public RespostaErroDto validarCartaoCredito(CartaoDto cartao) {
         RespostaErroDto resposta = new RespostaErroDto();
-        resposta.setStatus(404);
+        resposta.setStatus(200);
         resposta.setMessage("não programado para validar o cartão de "+ cartao.getNomeTitular());
         return resposta;
     }
 
-    /**
-     * Realiza a cobrança chamando a API externa via WebClient.
-     * * @param pedido Dados do pedido de cobrança.
-     * @return DTO da cobrança processada.
-     * @throws WebClientResponseException Se a API externa retornar erro 4xx ou 5xx.
-     * @throws RuntimeException Se houver erro de conexão ou timeout.
-     */
     public CobrancaDto realizarCobranca(PedidoCobrancaDto pedido) {
         String token = paypalAutenticacao.getTokenAutenticacao();
 
@@ -80,7 +73,7 @@ public class CobrancaService {
         Cobranca cobranca = new Cobranca();
         cobranca.setValor(pedido.getValor());
 
-        // Exemplo simplificado: pega status do map ou define default
+        // pega status do map ou define default
         String status = (respostaExterno != null && respostaExterno.containsKey("status"))
                 ? (String) respostaExterno.get("status")
                 : "COMPLETED";
