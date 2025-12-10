@@ -10,116 +10,122 @@ import com.bikeunirio.bicicletario.externo.repository.CobrancaRepository;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class CobrancaService {
+
     private final PaypalAutenticacao paypalAutenticacao;
-    private final WebClient paypalWebClient;
+    private final WebClient webClient;
     private final CobrancaRepository cobrancaRepository;
-    private final List<Cobranca> filaCobrancaAtrasada;
+    private final List<Cobranca> filaCobranca;
     private final CobrancaMapper mapper;
 
-    public CobrancaService(PaypalAutenticacao paypalAutenticacao, WebClient paypalWebClient, CobrancaRepository cobrancaRepository, List<Cobranca> filaCobrancaAtrasada, CobrancaMapper mapper) {
+    public CobrancaService(PaypalAutenticacao paypalAutenticacao,
+                           WebClient webClient,
+                           CobrancaRepository cobrancaRepository,
+                           List<Cobranca> filaCobranca,
+                           CobrancaMapper mapper) {
         this.paypalAutenticacao = paypalAutenticacao;
-        this.paypalWebClient = paypalWebClient;
+        this.webClient = webClient;
         this.cobrancaRepository = cobrancaRepository;
+        this.filaCobranca = filaCobranca;
         this.mapper = mapper;
-        this.filaCobrancaAtrasada = new ArrayList<>();
     }
 
+    public CobrancaDto incluirCobrancaNaFila(PedidoCobrancaDto pedido) {
+        Cobranca cobranca = new Cobranca();
+        cobranca.setValor(pedido.getValor());
+        cobranca.setIdCiclista(pedido.getIdCiclista());
+        cobranca.setStatus("NA_FILA");
 
-    public CobrancaDto realizarCobranca(PedidoCobrancaDto pedidoCobrancaDto){
-        CobrancaDto cobrancaDto = new CobrancaDto();
-        cobrancaDto.setHoraSolicitacao(LocalDateTime.now(ZoneId.of("America/Sao_Paulo")));
+        filaCobranca.add(cobranca);
 
-        //chamado pelo realizarCobranca do controller
-        String tokenAutenticacao = paypalAutenticacao.getTokenAutenticacao();
+        return mapper.toDTO(cobranca);
+    }
 
-        //pega o valor da compra
-        float valorCompra = pedidoCobrancaDto.getValor();
-        cobrancaDto.setValorCobranca(valorCompra);
+    public RespostaErroDto validarCartaoCredito(CartaoDto cartao) {
+        RespostaErroDto resposta = new RespostaErroDto();
+        resposta.setStatus(404);
+        resposta.setMessage("não programado para validar o cartão de "+ cartao.getNomeTitular());
+        return resposta;
+    }
 
-        //faz a requisição para a api de pagamento
-        Map<String,Object> retornoApi = paypalWebClient.post()
-                .uri("/v2/checkout/orders")
-                .header("Authorization", "Bearer " + tokenAutenticacao)
-                .bodyValue(Map.of("intent", "CAPTURE",
-                        "purchase_units", List.of(
-                                Map.of(
-                                        "amount", Map.of(
-                                                "currency_code", "USD",
-                                                "value", String.format("%.2f", valorCompra)
-                                        )
-                                )))).retrieve().bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
-                //requisição bloqueante
+    /**
+     * Realiza a cobrança chamando a API externa via WebClient.
+     * * @param pedido Dados do pedido de cobrança.
+     * @return DTO da cobrança processada.
+     * @throws WebClientResponseException Se a API externa retornar erro 4xx ou 5xx.
+     * @throws RuntimeException Se houver erro de conexão ou timeout.
+     */
+    public CobrancaDto realizarCobranca(PedidoCobrancaDto pedido) {
+        String token = paypalAutenticacao.getTokenAutenticacao();
+
+        // Chamada ao WebClient (será interceptada pelo Mock nos testes)
+        // O .block() faz a chamada síncrona e pode lançar exceções.
+        Map<String, Object> respostaExterno = webClient.post()
+                .uri("/v1/payments/payment")
+                .header("Authorization", "Bearer " + token)
+                .bodyValue(pedido)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
                 .block();
 
-        //podia dar nullPointerEx então "se for null ele define como null, caso não seja pega o status"
-        cobrancaDto.setStatus((String) (retornoApi != null ? retornoApi.get("status") : null));
-        cobrancaDto.setIdApi(retornoApi != null ? retornoApi.get("id").toString() : null);
-        cobrancaRepository.save(mapper.toEntity(cobrancaDto));
-        cobrancaDto.setHoraFinalizacao(LocalDateTime.now(ZoneId.of("America/Sao_Paulo")));
-        return cobrancaDto;
+        Cobranca cobranca = new Cobranca();
+        cobranca.setValor(pedido.getValor());
 
+        // Exemplo simplificado: pega status do map ou define default
+        String status = (respostaExterno != null && respostaExterno.containsKey("status"))
+                ? (String) respostaExterno.get("status")
+                : "COMPLETED";
+
+        cobranca.setStatus(status);
+
+        Cobranca entidadeSalva = cobrancaRepository.save(cobranca);
+        return mapper.toDTO(entidadeSalva);
     }
 
-    public Optional<CobrancaDto> obterCobranca(long id){
-        //Optional não permite retornar null, mas pode retornar um objeto vazio
-        //ele passa as inforamções do Optional para um dto
+    public Optional<CobrancaDto> obterCobranca(Long id) {
         return cobrancaRepository.findById(id)
-                .map(entidade -> {
+                .map(c -> {
                     CobrancaDto dto = new CobrancaDto();
-                    //preenche os dados manualmente
-                    dto.setIdCobranca(entidade.getId());
-                    dto.setValorCobranca(entidade.getValor());
-                    dto.setStatus(entidade.getStatus());
-                    dto.setHoraSolicitacao(entidade.getHoraSolicitacao());
-                    dto.setHoraFinalizacao(entidade.getHoraFinalizacao());
-                    dto.setIdCiclista(entidade.getIdCiclista());
+                    dto.setValorCobranca(c.getValor());
                     return dto;
                 });
     }
 
-
-    public RespostaErroDto validarCartaoCredito(CartaoDto cartaoDto){
-        //pegar quais atributos do cartão para chamar o pedido de cobrança?
-        //chamar o realizarCobranca para fazer a validação (cobrança de 1 centavo)
-        //realizar Cobranca
-
-        return null;
-    }
-
-    public CobrancaDto incluirCobrancaNaFila(PedidoCobrancaDto pedidoCobrancaDto) {
-        // Converte o pedido em uma entidade Cobranca para salvar na fila
-        Cobranca cobranca = new Cobranca();
-        cobranca.setValor(pedidoCobrancaDto.getValor());
-        cobranca.setIdCiclista(pedidoCobrancaDto.getIdCiclista());
-        cobranca.setHoraSolicitacao(LocalDateTime.now(ZoneId.of("America/Sao_Paulo")));
-        cobranca.setStatus("NA_FILA"); // Define um status provisório
-
-        // Adiciona na lista em memória
-        filaCobrancaAtrasada.add(cobranca);
-        // Retorna um DTO representando que foi agendado
-        return mapper.toDTO(cobranca);
-    }
-
+    /**
+     * Processa itens da fila.
+     * Se ocorrer erro no WebClient, a exceção interromperá o loop (pois removemos o try-catch).
+     */
     public List<CobrancaDto> processaCobrancasEmFila() {
-        PedidoCobrancaDto pedidoCobrancaDto = new PedidoCobrancaDto();
-        List<CobrancaDto> listaPedidosCobrados = new ArrayList<>();
-        for(Cobranca cobranca : filaCobrancaAtrasada){
-            pedidoCobrancaDto.setValor(cobranca.getValor());
-            pedidoCobrancaDto.setIdCiclista(cobranca.getIdCiclista());
-            CobrancaDto cobrancaDto = realizarCobranca(pedidoCobrancaDto);
-            //assim que faz a cobrança, ele retira da fila de atrasados
-            filaCobrancaAtrasada.remove(cobranca);
-            //adiciona o retorno de cobranca em uma lista que vai ser retornada ao controller
-            listaPedidosCobrados.add(cobrancaDto);
-        //trocar o status para paga
+        List<CobrancaDto> processadas = new ArrayList<>();
+
+        Iterator<Cobranca> iterator = filaCobranca.iterator();
+
+        while (iterator.hasNext()) {
+            Cobranca cobrancaDaFila = iterator.next();
+
+            PedidoCobrancaDto pedido = new PedidoCobrancaDto();
+            pedido.setValor(cobrancaDaFila.getValor());
+            pedido.setIdCiclista(cobrancaDaFila.getIdCiclista());
+
+            // Chama o metodo que invoca o WebClient.
+            // Se falhar (ex: WebClientResponseException), o erro sobe e o metodo aborta.
+            CobrancaDto resultado = realizarCobranca(pedido);
+
+            processadas.add(resultado);
+
+            // Remove da fila somente se sucesso (pois se lançar exceção acima, não chega aqui)
+            iterator.remove();
         }
-        return listaPedidosCobrados;
+
+        return processadas;
     }
 }

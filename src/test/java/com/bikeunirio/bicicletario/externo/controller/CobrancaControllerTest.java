@@ -41,9 +41,6 @@ class CobrancaControllerTest {
     @Mock
     private CobrancaService cobrancaService;
 
-    @Mock
-    private CobrancaMapper cobrancaMapper;
-
     @InjectMocks
     private CobrancaController cobrancaController;
 
@@ -101,47 +98,33 @@ class CobrancaControllerTest {
     }
 
     @Test
-    void testValidarCartaoCredito_Sucesso() throws Exception {
-        CartaoDto cartao = new CartaoDto();
-        RespostaErroDto resposta = new RespostaErroDto();
-        resposta.setStatus(200);
-
-        when(cobrancaService.validarCartaoCredito(any(CartaoDto.class))).thenReturn(resposta);
-
-        mockMvc.perform(post("/validarCartaoCredito")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(cartao)))
-                .andExpect(status().isOk());
-    }
-    @Test
     void validarCartaoCredito_Sucesso() throws Exception {
-        // Cenário
         CartaoDto cartao = new CartaoDto();
         RespostaErroDto resposta = new RespostaErroDto();
         resposta.setStatus(200);
-        // Assumindo que o toString retorna algo, ou o RespostaErroDto tem um toString padrão
+
 
         when(cobrancaService.validarCartaoCredito(any(CartaoDto.class))).thenReturn(resposta);
 
-        // Execução e Validação
+        //verifica
         mockMvc.perform(post("/validarCartaoCredito")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(cartao)))
                 .andExpect(status().isOk())
-                // Verifica se o corpo da resposta contem a string do objeto (conforme lógica do controller)
+                // verifica se o corpo da resposta contem a string do objeto (conforme lógica do controller)
                 .andExpect(content().string(resposta.toString()));
     }
 
     @Test
     void validarCartaoCredito_Falha() throws Exception {
-        // Cenário
+
         CartaoDto cartao = new CartaoDto();
         RespostaErroDto resposta = new RespostaErroDto();
         resposta.setStatus(422); // Status de erro
 
         when(cobrancaService.validarCartaoCredito(any(CartaoDto.class))).thenReturn(resposta);
 
-        // Execução e Validação
+        //verifica
         mockMvc.perform(post("/validarCartaoCredito")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(cartao)))
@@ -149,22 +132,19 @@ class CobrancaControllerTest {
                 .andExpect(content().string("validacao"));
     }
 
-    // --- TESTES DE FILA DE COBRANÇA ---
-
     @Test
     void incluirCobrancaNaFila_Sucesso() throws Exception {
-        // Cenário
+
         PedidoCobrancaDto pedido = new PedidoCobrancaDto();
 
-        // Simula o retorno null que está atualmente na sua implementação do Service
+        // simula retorno
         when(cobrancaService.incluirCobrancaNaFila(any(PedidoCobrancaDto.class))).thenReturn(null);
 
-        // Execução e Validação
+
         mockMvc.perform(post("/filaCobranca")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(pedido)))
                 .andExpect(status().isOk());
-        // Não validamos o body JSON pois retorna null/vazio neste caso
     }
 
     @Test
