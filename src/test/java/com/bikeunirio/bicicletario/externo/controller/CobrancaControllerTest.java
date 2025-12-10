@@ -4,7 +4,6 @@ import com.bikeunirio.bicicletario.externo.dto.CartaoDto;
 import com.bikeunirio.bicicletario.externo.dto.CobrancaDto;
 import com.bikeunirio.bicicletario.externo.dto.PedidoCobrancaDto;
 import com.bikeunirio.bicicletario.externo.dto.RespostaErroDto;
-import com.bikeunirio.bicicletario.externo.mapper.CobrancaMapper;
 import com.bikeunirio.bicicletario.externo.service.CobrancaService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;

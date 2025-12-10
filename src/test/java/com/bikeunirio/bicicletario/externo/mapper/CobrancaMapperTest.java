@@ -2,7 +2,6 @@ package com.bikeunirio.bicicletario.externo.mapper;
 
 import com.bikeunirio.bicicletario.externo.dto.CobrancaDto;
 import com.bikeunirio.bicicletario.externo.entity.Cobranca;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
