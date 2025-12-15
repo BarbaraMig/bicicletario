@@ -12,41 +12,41 @@ import org.springframework.web.client.HttpClientErrorException;
 
 
 @RestControllerAdvice
-public class GlobalExceptionHandler{
+public class GlobalExceptionHandler {
 
-    @ExceptionHandler(MailException.class)
-    public ResponseEntity<RespostaErroDto> handleMailException(MailException exception){
-        RespostaErroDto respostaDto = new RespostaErroDto(HttpStatus.INTERNAL_SERVER_ERROR.value(), exception.getMessage());
+    private ResponseEntity<RespostaErroDto> build(
+            HttpStatus status, String message) {
 
-        return ResponseEntity.status(respostaDto.getStatus()).body(respostaDto);
+        return ResponseEntity
+                .status(status)
+                .body(new RespostaErroDto(status.value(), message));
     }
 
-
+    //email
     @ExceptionHandler(MailParseException.class)
-    public ResponseEntity<RespostaErroDto> handleMailException(MailParseException exception){
-        RespostaErroDto respostaDto = new RespostaErroDto(HttpStatus.UNPROCESSABLE_ENTITY.value(),exception.getMessage());
+    public ResponseEntity<RespostaErroDto> handleMailParse(MailParseException ex) {
+        return build(HttpStatus.UNPROCESSABLE_ENTITY, "Email inválido");
+    }
 
-        return ResponseEntity.status(respostaDto.getStatus()).body(respostaDto);
+    @ExceptionHandler(MailException.class)
+    public ResponseEntity<RespostaErroDto> handleMail(MailException ex) {
+        return build(HttpStatus.INTERNAL_SERVER_ERROR, "Falha ao enviar email");
+    }
+
+    //http
+    @ExceptionHandler(HttpClientErrorException.NotFound.class)
+    public ResponseEntity<RespostaErroDto> handleNotFound(HttpClientErrorException.NotFound ex) {
+        return build(HttpStatus.NOT_FOUND, "Recurso não encontrado");
     }
 
     @ExceptionHandler(HttpClientErrorException.UnprocessableEntity.class)
-    public ResponseEntity<RespostaErroDto> handleUnprocessableEntity(HttpClientErrorException.UnprocessableEntity exception){
-        RespostaErroDto respostaDto = new RespostaErroDto(HttpStatus.UNPROCESSABLE_ENTITY.value(),exception.getMessage());
-
-        return ResponseEntity.status(respostaDto.getStatus()).body(respostaDto);
+    public ResponseEntity<RespostaErroDto> handleUnprocessable(HttpClientErrorException.UnprocessableEntity ex) {
+        return build(HttpStatus.UNPROCESSABLE_ENTITY, "Entidade inválida");
     }
 
-    @ExceptionHandler(HttpClientErrorException.NotFound.class)
-    public ResponseEntity<RespostaErroDto> handleNotFound(HttpClientErrorException.NotFound exception){
-        RespostaErroDto respostaDto = new RespostaErroDto(HttpStatus.NOT_FOUND.value(),exception.getMessage());
-
-        return ResponseEntity.status(respostaDto.getStatus()).body(respostaDto);
+    //exceção genérica
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<RespostaErroDto> handleRuntime(RuntimeException ex) {
+        return build(HttpStatus.INTERNAL_SERVER_ERROR, "Erro interno");
     }
-    @ExceptionHandler(NullPointerException.class)
-    public ResponseEntity<RespostaErroDto> handleNullPointerException(NullPointerException exception){
-        RespostaErroDto respostaDto = new RespostaErroDto(HttpStatus.INTERNAL_SERVER_ERROR.value(), exception.getMessage());
-
-        return ResponseEntity.status(respostaDto.getStatus()).body(respostaDto);
-    }
-
 }

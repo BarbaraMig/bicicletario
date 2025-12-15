@@ -13,8 +13,6 @@ import java.util.List;
 @RestController
 public class CobrancaController {
 
-
-
     private final CobrancaService cobrancaService;
 
     CobrancaController(CobrancaService cobrancaService){
@@ -22,7 +20,7 @@ public class CobrancaController {
     }
 
     //finalizado
-    @GetMapping("/cobranca/{idCobranca}")
+    @GetMapping(" ")
     public ResponseEntity<CobrancaDto> recuperarCobranca(@PathVariable long idCobranca){
         // Se o Optional retornado em service.obterCobranca existir, converte para DTO e
         // retorna 200 OK. Se não, 404 Not Found.
