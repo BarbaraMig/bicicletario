@@ -1,42 +1,50 @@
 package com.bikeunirio.bicicletario.externo.service;
 
-
+import com.bikeunirio.bicicletario.externo.SendGridClient;
+import com.bikeunirio.bicicletario.externo.config.SendGridConfigurationProperties;
 import com.bikeunirio.bicicletario.externo.dto.EmailDto;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
-
-import java.util.regex.Pattern;
+import org.springframework.util.StringUtils;
 
 @Service
 public class EmailService {
 
-    private final JavaMailSender mailSender;
+    private final SendGridClient sendGridClient;
+    private final SendGridConfigurationProperties props;
 
-    public EmailService( JavaMailSender mailSender){
-        this.mailSender = mailSender;
+    public EmailService(SendGridClient sendGridClient,
+                        SendGridConfigurationProperties props) {
+        this.sendGridClient = sendGridClient;
+        this.props = props;
     }
 
+    public void enviarEmail(EmailDto dto) {
+        validar(dto);
 
-    public boolean enviarEmail(EmailDto emailDto){
-        //construtor do SimpleMailMessage não recebe nenhum parâmetro
-        SimpleMailMessage email = new SimpleMailMessage();
-        String receptor = emailDto.getReceptor();
-        if(validarFormatoEmail(receptor)){
-            email.setText(emailDto.getMensagem());
-            email.setSubject(emailDto.getAssunto());
-            email.setTo(receptor);
-            email.setFrom("emailexternoes2@gmail.com");
-            mailSender.send(email);
-            return true;
+        sendGridClient.enviarEmail(
+                props.getFromEmail(),
+                props.getFromName(),
+                dto.getReceptor(),
+                dto.getAssunto(),
+                dto.getMensagem()
+        );
+    }
+
+    private void validar(EmailDto dto) {
+        if (dto == null) {
+            throw new IllegalArgumentException("EmailDto não pode ser nulo");
         }
-        return false;
-        //exceções são tratadas pelo Global Handler
-    }
-    //validação do email
-    private boolean validarFormatoEmail(String emailAddress) {
-        return Pattern.compile("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")
-                .matcher(emailAddress)
-                .matches();
+
+        if (!StringUtils.hasText(dto.getReceptor())) {
+            throw new IllegalArgumentException("Receptor do email é obrigatório");
+        }
+
+        if (!StringUtils.hasText(dto.getAssunto())) {
+            throw new IllegalArgumentException("Assunto do email é obrigatório");
+        }
+
+        if (!StringUtils.hasText(dto.getMensagem())) {
+            throw new IllegalArgumentException("Mensagem do email é obrigatória");
+        }
     }
 }

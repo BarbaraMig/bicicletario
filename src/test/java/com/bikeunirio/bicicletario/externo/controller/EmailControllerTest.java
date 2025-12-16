@@ -7,22 +7,21 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailParseException;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(MockitoExtension.class)
-@Import(GlobalExceptionHandler.class)
 class EmailControllerTest {
 
     private MockMvc mockMvc;
@@ -33,66 +32,78 @@ class EmailControllerTest {
     private EmailService emailService;
 
     @BeforeEach
-    void setup(){
-        EmailController emailController = new EmailController(emailService);
+    void setup() {
+        EmailController controller = new EmailController(emailService);
 
-        mockMvc = MockMvcBuilders.standaloneSetup(emailController)
-                // registra o tratador de exceções manualmente
+        mockMvc = MockMvcBuilders.standaloneSetup(controller)
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
     }
 
-    // Teste 1: Caminho feliz (HTTP 200)
+    // ===============================
+    // Teste 1 — Sucesso (200 OK)
+    // ===============================
     @Test
     void testEnviarEmail_Sucesso() throws Exception {
-        EmailDto dto = new EmailDto("emailexternoes2@gmail.com", "assunto", "mensagem");
-
-        //enviar email retorna boolean
-        when(emailService.enviarEmail(any(EmailDto.class))).thenReturn(true);
-
-
-        // Simula a chamada POST para /enviarEmail
-        mockMvc.perform(post("/enviarEmail")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto))) // converte dto em json
-                .andExpect(status().isOk()) // Espera status 200
-                .andExpect(jsonPath("$.receptor").value(dto.getReceptor()))
-                .andExpect(jsonPath("$.assunto").value(dto.getAssunto()));
-    }
-
-    // MailParseException (http 422)
-    @Test
-    void testEnviarEmail_Falha_MailParseException() throws Exception {
-        EmailDto dto = new EmailDto("email_invalido", "assunto", "mensagem");
-
-        // o service lança a exceção que o handler vai capturar
-        doThrow(new MailParseException("Email inválido")).when(emailService).enviarEmail(
-                ArgumentMatchers.argThat(email -> email.getReceptor().equals("email_invalido"))
+        EmailDto dto = new EmailDto(
+                "emailexternoes2@gmail.com",
+                "Assunto teste",
+                "Mensagem teste"
         );
+
+        // service agora é void
+        doNothing().when(emailService).enviarEmail(any(EmailDto.class));
 
         mockMvc.perform(post("/enviarEmail")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isUnprocessableEntity()) // Espera status 422
-                .andExpect(jsonPath("$.status").value(422)) // Verifica o corpo do erro
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.receptor").value(dto.getReceptor()))
+                .andExpect(jsonPath("$.assunto").value(dto.getAssunto()))
+                .andExpect(jsonPath("$.mensagem").value(dto.getMensagem()));
+    }
+
+    // ======================================
+    // Teste 2 — MailParseException (422)
+    // ======================================
+    @Test
+    void testEnviarEmail_Falha_MailParseException() throws Exception {
+        EmailDto dto = new EmailDto(
+                "email_invalido",
+                "Assunto",
+                "Mensagem"
+        );
+
+        doThrow(new MailParseException("Email inválido"))
+                .when(emailService).enviarEmail(any(EmailDto.class));
+
+        mockMvc.perform(post("/enviarEmail")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.status").value(422))
                 .andExpect(jsonPath("$.message").value("Email inválido"));
     }
 
-    // MailException (http 500)
+    // ======================================
+    // Teste 3 — MailException (500)
+    // ======================================
     @Test
     void testEnviarEmail_Falha_MailException() throws Exception {
-        EmailDto dto = new EmailDto("email@existe.com", "assunto", "mensagem");
-
-        // Mocka o serviço para LANÇAR a exceção
-        doThrow(new MailException("Erro de servidor de email") {}).when(emailService).enviarEmail(
-                ArgumentMatchers.argThat(email -> email.getReceptor().equals("email@existe.com"))
+        EmailDto dto = new EmailDto(
+                "email@existe.com",
+                "Assunto",
+                "Mensagem"
         );
+
+        doThrow(new MailException("Erro de servidor de email") {})
+                .when(emailService).enviarEmail(any(EmailDto.class));
 
         mockMvc.perform(post("/enviarEmail")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isInternalServerError()) // Espera status 500
-                .andExpect(jsonPath("$.status").value(500)) // Verifica o corpo do erro
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.status").value(500))
                 .andExpect(jsonPath("$.message").value("Erro de servidor de email"));
     }
 }
