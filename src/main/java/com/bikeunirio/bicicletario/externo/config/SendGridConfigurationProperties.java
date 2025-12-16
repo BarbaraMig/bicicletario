@@ -16,11 +16,9 @@ public class SendGridConfigurationProperties {
     private String apiKey;
 
     @Email
-    @NotBlank
-    private String fromEmail;
+    private final String fromEmail = "emailexternoes2@gmail.com";
 
-    @NotBlank
-    private String fromName;
+    private final String fromName = "BikeUnirio";
 
     public String getApiKey() {
         return apiKey;
@@ -34,15 +32,7 @@ public class SendGridConfigurationProperties {
         return fromEmail;
     }
 
-    public void setFromEmail(String fromEmail) {
-        this.fromEmail = fromEmail;
-    }
-
     public String getFromName() {
         return fromName;
-    }
-
-    public void setFromName(String fromName) {
-        this.fromName = fromName;
     }
 }
