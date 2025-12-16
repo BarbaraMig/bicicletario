@@ -11,6 +11,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.reactive.function.BodyInserter;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
@@ -34,7 +35,7 @@ class PaypalAutenticacaoTest {
     private WebClient.RequestBodySpec requestBodySpec;
 
     @Mock
-    private WebClient.RequestHeadersSpec requestHeadersSpec; // Removido o <?> para facilitar o Mock
+    private WebClient.RequestHeadersSpec requestHeadersSpec;
 
     @Mock
     private WebClient.ResponseSpec responseSpec;
@@ -51,16 +52,7 @@ class PaypalAutenticacaoTest {
                 "expires_in", 3600
         );
 
-        // Configuração da cadeia de mocks do WebClient
-        when(webClient.post()).thenReturn(requestBodyUriSpec);
-        when(requestBodyUriSpec.uri("/v1/oauth2/token")).thenReturn(requestBodySpec);
-        when(requestBodySpec.header(eq(HttpHeaders.AUTHORIZATION), anyString())).thenReturn(requestBodySpec);
-        when(requestBodySpec.contentType(MediaType.APPLICATION_FORM_URLENCODED)).thenReturn(requestBodySpec);
-        when(requestBodySpec.bodyValue("grant_type=client_credentials")).thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
-
-        when(responseSpec.bodyToMono(any(ParameterizedTypeReference.class)))
-                .thenReturn(Mono.just(respostaPaypal));
+        mockWebClient(respostaPaypal, null);
 
         // ------- EXECUÇÃO -------
         String tokenObtido = paypalAutenticacao.getTokenAutenticacao();
@@ -103,14 +95,7 @@ class PaypalAutenticacaoTest {
                 "expires_in", 3600
         );
 
-        when(webClient.post()).thenReturn(requestBodyUriSpec);
-        when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodySpec);
-        when(requestBodySpec.header(any(), any())).thenReturn(requestBodySpec);
-        when(requestBodySpec.contentType(any())).thenReturn(requestBodySpec);
-        when(requestBodySpec.bodyValue(anyString())).thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.bodyToMono(any(ParameterizedTypeReference.class)))
-                .thenReturn(Mono.just(respostaPaypal));
+        mockWebClient(respostaPaypal, null);
 
         // ------- EXECUÇÃO -------
         String tokenObtido = paypalAutenticacao.getTokenAutenticacao();
@@ -122,21 +107,37 @@ class PaypalAutenticacaoTest {
 
     @Test
     void getTokenAutenticacao_FalhaApi() {
-        //config do webclient
+        mockWebClient(null, new RuntimeException("Erro Paypal"));
+        assertThrows(RuntimeException.class,
+                () -> paypalAutenticacao.getTokenAutenticacao());
+    }
+
+    private void mockWebClient(
+            Map<String, Object> respostaSucesso,
+            RuntimeException excecao
+    ) {
         when(webClient.post()).thenReturn(requestBodyUriSpec);
         when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodySpec);
-        when(requestBodySpec.header(any(), any())).thenReturn(requestBodySpec);
-        when(requestBodySpec.contentType(any())).thenReturn(requestBodySpec);
-        when(requestBodySpec.bodyValue(anyString())).thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
 
-        // erro
-        when(responseSpec.bodyToMono(any(ParameterizedTypeReference.class)))
-                .thenThrow(new RuntimeException("Erro de conexão com PayPal"));
+        when(requestBodySpec.header(anyString(), anyString()))
+                .thenReturn(requestBodySpec);
+        when(requestBodySpec.contentType(any()))
+                .thenReturn(requestBodySpec);
 
-        //executa e valida
-        assertThrows(RuntimeException.class, () -> {
-            paypalAutenticacao.getTokenAutenticacao();
-        });
+        when(requestBodySpec.body(any(BodyInserter.class)))
+                .thenReturn(requestHeadersSpec);
+
+        when(requestHeadersSpec.retrieve())
+                .thenReturn(responseSpec);
+
+        if (excecao != null) {
+            when(responseSpec.bodyToMono(any(ParameterizedTypeReference.class)))
+                    .thenThrow(excecao);
+        } else {
+            when(responseSpec.bodyToMono(any(ParameterizedTypeReference.class)))
+                    .thenReturn(Mono.just(respostaSucesso));
+        }
     }
+
+
 }

@@ -37,8 +37,6 @@ class EmailServiceTest {
                 "Mensagem"
         );
 
-        when(props.getFromEmail()).thenReturn("emailexternoes2@gmail.com");
-        when(props.getFromName()).thenReturn("BikeUnirio");
 
         doNothing().when(sendGridClient).enviarEmail(
                 anyString(),
@@ -76,9 +74,6 @@ class EmailServiceTest {
                 "Assunto",
                 "Mensagem"
         );
-
-        when(props.getFromEmail()).thenReturn("emailexternoes2@gmail.com");
-        when(props.getFromName()).thenReturn("BikeUnirio");
 
         doThrow(new RuntimeException("Erro SendGrid"))
                 .when(sendGridClient)
