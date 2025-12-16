@@ -6,6 +6,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.time.Instant;
@@ -46,7 +47,7 @@ public class PaypalAutenticacao {
                 //pega o tipo de autenticacao e
                 .header(HttpHeaders.AUTHORIZATION, auth())
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .bodyValue("grant_type=client_credentials")
+                .body(BodyInserters.fromFormData("grant_type", "client_credentials"))
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
                 //block esperar a resposta de forma bloqueante

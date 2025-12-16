@@ -68,9 +68,9 @@ public class CobrancaService {
         cobranca.setIdCiclista(pedido.getIdCiclista());
 
         //metodo que recupera/gera um token de autenticação para a API
-        String token = paypalAutenticacao.getTokenAutenticacao();
 
-        Map<String, Object> respostaExterno = montarRequisicaoCobranca(pedido, token);
+
+        Map<String, Object> respostaExterno = montarRequisicaoCobranca(pedido);
 
 
         cobranca.setValor(pedido.getValor());
@@ -127,7 +127,8 @@ public class CobrancaService {
     }
 
 
-    private Map<String, Object> montarRequisicaoCobranca(PedidoCobrancaDto pedido, String token) {
+    private Map<String, Object> montarRequisicaoCobranca(PedidoCobrancaDto pedido) {
+        String token = paypalAutenticacao.getTokenAutenticacao();
 
         Map<String, Object> amount = new HashMap<>();
         amount.put("currency_code", "BRL");
@@ -137,16 +138,20 @@ public class CobrancaService {
         Map<String, Object> purchaseUnit = new HashMap<>();
         purchaseUnit.put("amount", amount);
         purchaseUnit.put("description", "Cobranca ID Ciclista: " + pedido.getIdCiclista());
-        purchaseUnit.put("reference_id", "default"); // Opcional, mas bom para rastreio
+
+        Map<String, Object> applicationContext = new HashMap<>();
+        applicationContext.put("return_url","https://bicicletarioexterno.onrender.com");
+        applicationContext.put("cancel_url","https://bicicletarioexterno.onrender.com");
 
 
         Map<String, Object> paypalRequest = new HashMap<>();
         paypalRequest.put("intent", "CAPTURE"); // V2 usa CAPTURE ou AUTHORIZE
         paypalRequest.put("purchase_units", Collections.singletonList(purchaseUnit));
+        paypalRequest.put("application_context", applicationContext); // <--- Adicionado aqui
 
 
         return webClient.post()
-                .uri("/v2/checkout/orders") // <--- MUDANÇA IMPORTANTE: V2 URL
+                .uri("/v2/checkout/orders")
                 .header("Authorization", "Bearer " + token)
                 .bodyValue(paypalRequest)
                 .retrieve()
