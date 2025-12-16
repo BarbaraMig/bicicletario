@@ -43,16 +43,12 @@ class EmailServiceTest {
         doNothing().when(sendGridClient).enviarEmail(
                 anyString(),
                 anyString(),
-                anyString(),
-                anyString(),
                 anyString()
         );
 
         assertDoesNotThrow(() -> emailService.enviarEmail(dto));
 
         verify(sendGridClient, times(1)).enviarEmail(
-                eq("emailexternoes2@gmail.com"),
-                eq("BikeUnirio"),
                 eq(dto.getReceptor()),
                 eq(dto.getAssunto()),
                 eq(dto.getMensagem())
@@ -86,7 +82,7 @@ class EmailServiceTest {
 
         doThrow(new RuntimeException("Erro SendGrid"))
                 .when(sendGridClient)
-                .enviarEmail(any(), any(), any(), any(), any());
+                .enviarEmail(any(), any(), any());
 
         RuntimeException ex =
                 assertThrows(RuntimeException.class, () -> emailService.enviarEmail(dto));

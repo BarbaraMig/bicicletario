@@ -18,13 +18,12 @@ public class SendGridClient {
     }
 
     public void enviarEmail(
-            String fromEmail,
-            String fromName,
             String toEmail,
             String subject,
             String body
     ) {
-        Email from = new Email(fromEmail, fromName);
+        Email from = new Email("emailexternoes2@gmail.com",
+                "BikeUnirio");
         Email to = new Email(toEmail);
         Content content = new Content("text/plain", body);
         Mail mail = new Mail(from, subject, to, content);

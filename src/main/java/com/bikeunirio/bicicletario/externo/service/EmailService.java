@@ -22,8 +22,6 @@ public class EmailService {
         validar(dto);
 
         sendGridClient.enviarEmail(
-                props.getFromEmail(),
-                props.getFromName(),
                 dto.getReceptor(),
                 dto.getAssunto(),
                 dto.getMensagem()
