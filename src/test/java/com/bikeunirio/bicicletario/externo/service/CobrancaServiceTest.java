@@ -60,15 +60,24 @@ class CobrancaServiceTest {
         pedido.setIdCiclista(3L);
 
         CobrancaDto dtoEsperado = new CobrancaDto();
-        dtoEsperado.setStatus("NA_FILA");
+        dtoEsperado.setStatus(CobrancaEnum.PENDENTE.name());
+        dtoEsperado.setValorCobranca(50F);
 
+        Cobranca cobrancaMock = new Cobranca();
+        cobrancaMock.setId(1L);
+        cobrancaMock.setValor(50F);
+        cobrancaMock.setStatus("PENDENTE");
+
+        when(cobrancaRepository.save(any(Cobranca.class))).thenReturn(cobrancaMock);
         when(mapper.toDTO(any(Cobranca.class))).thenReturn(dtoEsperado);
 
         CobrancaDto resultado = cobrancaService.incluirCobrancaNaFila(pedido);
 
         assertEquals(1, filaCobranca.size());
-        //pendente significa que deve estar na fila
         assertEquals(String.valueOf(CobrancaEnum.PENDENTE), resultado.getStatus());
+
+        // verifica se chamou o save
+        verify(cobrancaRepository, times(1)).save(any(Cobranca.class));
     }
 
     @Test
@@ -83,70 +92,80 @@ class CobrancaServiceTest {
     void realizarCobranca_Sucesso() {
         PedidoCobrancaDto pedido = new PedidoCobrancaDto();
         pedido.setValor(10.50f);
+        pedido.setIdCiclista(1L);
 
-        // configura o Mock do WebClient para retornar sucesso
+        // Prepara mocks do WebClient e Auth
         prepararMocksWebClientSuccess();
-        when(paypalAutenticacao.getTokenAutenticacao(pedido)).thenReturn("TOKEN_FAKE");
+        when(paypalAutenticacao.getTokenAutenticacao()).thenReturn("TOKEN_FAKE");
 
+        // Prepara mocks do Repository e Mapper (necessários pois realizarCobranca chama eles no fim)
         Cobranca cobrancaSalva = new Cobranca();
         cobrancaSalva.setStatus(String.valueOf(CobrancaEnum.PAGA));
 
-        when(cobrancaRepository.save(any())).thenReturn(cobrancaSalva);
-        when(mapper.toDTO(any(Cobranca.class))).thenReturn(new CobrancaDto() {{ setStatus("COMPLETED"); }});
+        when(cobrancaRepository.save(any(Cobranca.class))).thenReturn(cobrancaSalva);
 
+        CobrancaDto dtoRetorno = new CobrancaDto();
+        dtoRetorno.setStatus(CobrancaEnum.PAGA.name());
+        when(mapper.toDTO(any(Cobranca.class))).thenReturn(dtoRetorno);
+
+        // Execução
         CobrancaDto resultado = cobrancaService.realizarCobranca(pedido);
 
+        // Asserts
         assertEquals(String.valueOf(CobrancaEnum.PAGA), resultado.getStatus());
-
-        // verifica se o save foi chamado
         verify(cobrancaRepository, times(1)).save(any());
-        // verifica se o WebClient foi realmente invocado
         verify(webClient, times(1)).post();
     }
 
     @Test
     void processaCobrancasEmFila_Sucesso() {
-        //criações necesssárias
+        // Setup da Fila
         Cobranca itemFila = new Cobranca();
-        itemFila.setValor(100f);
+        itemFila.setValor(100F);
         itemFila.setIdCiclista(10L);
-        filaCobranca.add(itemFila);
+        filaCobranca.add(itemFila); // Adiciona item real na lista real
 
-        CobrancaDto cobrancaDto = new CobrancaDto();
-        cobrancaDto.setValorCobranca(15F);
-        cobrancaDto.setIdCiclista(10L);
+        // CORREÇÃO PRINCIPAL: Não mockar cobrancaService.realizarCobranca.
+        // Devemos mockar o que o realizarCobranca usa internamente.
 
+        // 1. Mocks do WebClient e Auth (usados dentro de realizarCobranca)
         prepararMocksWebClientSuccess();
-        when(paypalAutenticacao.getTokenAutenticacao(any(PedidoCobrancaDto.class))).thenReturn("TOKEN_FAKE");
+        when(paypalAutenticacao.getTokenAutenticacao()).thenReturn("TOKEN_FAKE");
 
+        // 2. Mocks do Repository e Mapper (usados dentro de realizarCobranca)
         Cobranca cobrancaSalva = new Cobranca();
-        cobrancaSalva.setStatus(String.valueOf(CobrancaEnum.PAGA));
+        cobrancaSalva.setStatus("PAGA");
+        when(cobrancaRepository.save(any(Cobranca.class))).thenReturn(cobrancaSalva);
 
-        when(cobrancaService.realizarCobranca(any(PedidoCobrancaDto.class))).thenReturn(cobrancaDto);
+        CobrancaDto dtoSucesso = new CobrancaDto();
+        dtoSucesso.setStatus("PAGA");
+        when(mapper.toDTO(any(Cobranca.class))).thenReturn(dtoSucesso);
 
-        //execução
+        // Execução
         List<CobrancaDto> resultados = cobrancaService.processaCobrancasEmFila();
 
-        //verificação
-        assertEquals(0, filaCobranca.size(), "O item deveria ter sido removido da fila real");
+        // Verificação
+        assertEquals(0, filaCobranca.size(), "O item deveria ter sido removido da fila após sucesso");
         assertEquals(1, resultados.size());
 
-        // Garante que o WebClient foi chamado 1 vez através do metodo interno
+        // Verifica se o fluxo interno ocorreu
         verify(webClient, times(1)).post();
     }
 
     @Test
     void obterCobranca_Sucesso() {
-        //cria e inicia cobrança
         Cobranca cobranca = new Cobranca();
         cobranca.setId(1L);
         cobranca.setValor(200F);
 
-        //quando cobrança de 1L for procurado no repository, retorne um Optional da cobrança
         when(cobrancaRepository.findById(1L)).thenReturn(Optional.of(cobranca));
-        //chamada da função em si
+
+        // CORREÇÃO: Necessário mockar o mapper.toDTO, caso contrário retorna null
+        // e o Optional.map(null) resulta em Optional.empty()
+        when(mapper.toDTO(any(Cobranca.class))).thenReturn(new CobrancaDto());
+
         Optional<CobrancaDto> resultado = cobrancaService.obterCobranca(1L);
-        //conferir se há algum retorno no resultado
+
         assertTrue(resultado.isPresent());
     }
 

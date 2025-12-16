@@ -63,7 +63,7 @@ class PaypalAutenticacaoTest {
                 .thenReturn(Mono.just(respostaPaypal));
 
         // ------- EXECUÇÃO -------
-        String tokenObtido = paypalAutenticacao.getTokenAutenticacao(any(PedidoCobrancaDto.class));
+        String tokenObtido = paypalAutenticacao.getTokenAutenticacao();
 
         // ------- VERIFICAÇÕES -------
         assertEquals("TOKEN_NOVO_123", tokenObtido);
@@ -81,7 +81,7 @@ class PaypalAutenticacaoTest {
         ReflectionTestUtils.setField(paypalAutenticacao, "expiracao", Instant.now().plusSeconds(3600));
 
         // ------- EXECUÇÃO -------
-        String tokenObtido = paypalAutenticacao.getTokenAutenticacao(any(PedidoCobrancaDto.class));
+        String tokenObtido = paypalAutenticacao.getTokenAutenticacao();
 
         // ------- VERIFICAÇÕES -------
         assertEquals("TOKEN_CACHEADO_ABC", tokenObtido);
@@ -113,7 +113,7 @@ class PaypalAutenticacaoTest {
                 .thenReturn(Mono.just(respostaPaypal));
 
         // ------- EXECUÇÃO -------
-        String tokenObtido = paypalAutenticacao.getTokenAutenticacao(any(PedidoCobrancaDto.class));
+        String tokenObtido = paypalAutenticacao.getTokenAutenticacao();
 
         // ------- VERIFICAÇÕES -------
         assertEquals("TOKEN_RENOVADO_999", tokenObtido);
@@ -136,7 +136,7 @@ class PaypalAutenticacaoTest {
 
         //executa e valida
         assertThrows(RuntimeException.class, () -> {
-            paypalAutenticacao.getTokenAutenticacao(any(PedidoCobrancaDto.class));
+            paypalAutenticacao.getTokenAutenticacao();
         });
     }
 }

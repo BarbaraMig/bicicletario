@@ -48,9 +48,11 @@ public class CobrancaService {
         cobranca.setHoraSolicitacao(horario);
         cobranca.setHoraFinalizacao(horario);
 
-        filaCobranca.add(cobranca);
+        Cobranca salva = cobrancaRepository.save(cobranca);
+        filaCobranca.add(salva);
 
-        return mapper.toDTO(cobranca);
+
+        return mapper.toDTO(salva);
     }
 
     public RespostaHttpDto validarCartaoCredito(CartaoDto cartao) {

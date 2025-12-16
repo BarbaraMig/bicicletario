@@ -32,12 +32,12 @@ class EmailServiceTest {
     @Test
     void enviarEmail_sucesso() {
         EmailDto dto = new EmailDto(
-                "destino@teste.com",
+                "emailexternoes2@gmail.com",
                 "Assunto",
                 "Mensagem"
         );
 
-        when(props.getFromEmail()).thenReturn("noreply@teste.com");
+        when(props.getFromEmail()).thenReturn("emailexternoes2@gmail.com");
         when(props.getFromName()).thenReturn("BikeUnirio");
 
         doNothing().when(sendGridClient).enviarEmail(
@@ -81,7 +81,7 @@ class EmailServiceTest {
                 "Mensagem"
         );
 
-        when(props.getFromEmail()).thenReturn("noreply@teste.com");
+        when(props.getFromEmail()).thenReturn("emailexternoes2@gmail.com");
         when(props.getFromName()).thenReturn("BikeUnirio");
 
         doThrow(new RuntimeException("Erro SendGrid"))
