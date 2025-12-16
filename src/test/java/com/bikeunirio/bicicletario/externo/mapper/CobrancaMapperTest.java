@@ -16,7 +16,7 @@ class CobrancaMapperTest {
 
     @Test
     void deveConverterEntityParaDtoComSucesso() {
-        // 1. Cenário (Arrange)
+        //setup
         Cobranca entity = new Cobranca();
         entity.setId(1L);
         entity.setValor(50.0F);
@@ -25,10 +25,11 @@ class CobrancaMapperTest {
         entity.setHoraSolicitacao(LocalDateTime.now());
         entity.setHoraFinalizacao(LocalDateTime.now().plusHours(1));
 
-        // 2. Ação (Act)
+        //mocks não são necessários
+        //execução
         CobrancaDto resultado = mapper.toDTO(entity);
 
-        // 3. Verificação (Assert)
+        //verificações
         assertNotNull(resultado);
         assertEquals(entity.getId(), resultado.getIdCobranca());
         assertEquals(entity.getValor(), resultado.getValorCobranca());
@@ -46,7 +47,7 @@ class CobrancaMapperTest {
 
     @Test
     void deveConverterDtoParaEntityComSucesso() {
-        // 1. Cenário (Arrange)
+        //setup
         CobrancaDto dto = new CobrancaDto();
         dto.setIdCobranca(2L);
         dto.setValorCobranca(75.50F);
@@ -54,11 +55,11 @@ class CobrancaMapperTest {
         dto.setStatus("PAGO");
         dto.setHoraSolicitacao(LocalDateTime.now().minusHours(2));
         dto.setHoraFinalizacao(LocalDateTime.now().minusHours(1));
-
-        // 2. Ação (Act)
+        //mocks não são necessários
+        //execução
         Cobranca resultado = mapper.toEntity(dto);
 
-        // 3. Verificação (Assert)
+        //verificações
         assertNotNull(resultado);
         assertEquals(dto.getIdCobranca(), resultado.getId());
         assertEquals(dto.getValorCobranca(), resultado.getValor());

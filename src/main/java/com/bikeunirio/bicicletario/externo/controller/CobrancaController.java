@@ -24,7 +24,7 @@ public class CobrancaController {
     //finalizado
     @GetMapping("/cobranca/{idCobranca}")
     public ResponseEntity<CobrancaDto> recuperarCobranca(@PathVariable long idCobranca){
-        // Se o Optional retornado em service.obterCobranca existir, converte para DTO e
+        // se o Optional retornado em service.obterCobranca existir, converte para DTO e
         // retorna 200 OK. Se não, 404 Not Found.
         return cobrancaService.obterCobranca(idCobranca)
                 .map(cobrancaDto -> ResponseEntity.ok(cobrancaDto))
@@ -44,7 +44,6 @@ public class CobrancaController {
 
         if(resposta.getStatus() == 200)
             return ResponseEntity.ok().body(resposta.toString());
-        //ta certo chamar o toString assim???
         return ResponseEntity.ok("validacao");
     }
 
