@@ -5,6 +5,7 @@ import com.bikeunirio.bicicletario.externo.dto.CobrancaDto;
 import com.bikeunirio.bicicletario.externo.dto.PedidoCobrancaDto;
 import com.bikeunirio.bicicletario.externo.dto.RespostaErroDto;
 import com.bikeunirio.bicicletario.externo.entity.Cobranca;
+import com.bikeunirio.bicicletario.externo.enums.CobrancaEnum;
 import com.bikeunirio.bicicletario.externo.mapper.CobrancaMapper;
 import com.bikeunirio.bicicletario.externo.repository.CobrancaRepository;
 import org.springframework.core.ParameterizedTypeReference;
@@ -42,7 +43,7 @@ public class CobrancaService {
         Cobranca cobranca = new Cobranca();
         cobranca.setValor(pedido.getValor());
         cobranca.setIdCiclista(pedido.getIdCiclista());
-        cobranca.setStatus("NA_FILA");
+        cobranca.setStatus(String.valueOf(CobrancaEnum.PENDENTE));
 
         filaCobranca.add(cobranca);
 
@@ -57,10 +58,10 @@ public class CobrancaService {
     }
 
     public CobrancaDto realizarCobranca(PedidoCobrancaDto pedido) {
+        //metodo que recupera/gera um token de autenticação para a API
         String token = paypalAutenticacao.getTokenAutenticacao();
 
-        // Chamada ao WebClient (será interceptada pelo Mock nos testes)
-        // O .block() faz a chamada síncrona e pode lançar exceções.
+        //chamada ao webclient
         Map<String, Object> respostaExterno = webClient.post()
                 .uri("/v1/payments/payment")
                 .header("Authorization", "Bearer " + token)
@@ -72,10 +73,11 @@ public class CobrancaService {
         Cobranca cobranca = new Cobranca();
         cobranca.setValor(pedido.getValor());
 
-        // pega status do map ou define default
+        //caso a resposta não seja null e exista o atributo status -> getStatus
+        //caso contrário, marca a cobraça como Erro
         String status = (respostaExterno != null && respostaExterno.containsKey("status"))
                 ? (String) respostaExterno.get("status")
-                : "COMPLETED";
+                : String.valueOf(CobrancaEnum.ERRO);
 
         cobranca.setStatus(status);
 
@@ -85,17 +87,13 @@ public class CobrancaService {
 
     public Optional<CobrancaDto> obterCobranca(Long id) {
         return cobrancaRepository.findById(id)
-                .map(c -> {
+                .map(cobranca -> {
                     CobrancaDto dto = new CobrancaDto();
-                    dto.setValorCobranca(c.getValor());
+                    dto.setValorCobranca(cobranca.getValor());
                     return dto;
                 });
     }
 
-    /**
-     * Processa itens da fila.
-     * Se ocorrer erro no WebClient, a exceção interromperá o loop (pois removemos o try-catch).
-     */
     public List<CobrancaDto> processaCobrancasEmFila() {
         List<CobrancaDto> processadas = new ArrayList<>();
 
@@ -108,13 +106,12 @@ public class CobrancaService {
             pedido.setValor(cobrancaDaFila.getValor());
             pedido.setIdCiclista(cobrancaDaFila.getIdCiclista());
 
-            // Chama o metodo que invoca o WebClient.
-            // Se falhar (ex: WebClientResponseException), o erro sobe e o metodo aborta.
+            //se o webClient der problema, lança exceção
             CobrancaDto resultado = realizarCobranca(pedido);
 
             processadas.add(resultado);
 
-            // Remove da fila somente se sucesso (pois se lançar exceção acima, não chega aqui)
+            // remove da fila somente se sucesso, se lançar exceção acima, não chega aqui
             iterator.remove();
         }
 

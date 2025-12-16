@@ -42,11 +42,6 @@ public class GlobalExceptionHandler{
 
         return ResponseEntity.status(respostaDto.getStatus()).body(respostaDto);
     }
-    @ExceptionHandler(NullPointerException.class)
-    public ResponseEntity<RespostaErroDto> handleNullPointerException(NullPointerException exception){
-        RespostaErroDto respostaDto = new RespostaErroDto(HttpStatus.INTERNAL_SERVER_ERROR.value(), exception.getMessage());
 
-        return ResponseEntity.status(respostaDto.getStatus()).body(respostaDto);
-    }
 
 }

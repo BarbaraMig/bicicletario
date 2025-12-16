@@ -1,7 +1,5 @@
 package com.bikeunirio.bicicletario.externo.entity;
 
-
-
 import java.time.LocalDateTime;
 import java.util.List;
 
