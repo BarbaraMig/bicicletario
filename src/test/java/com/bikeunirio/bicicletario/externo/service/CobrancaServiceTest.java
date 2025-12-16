@@ -3,7 +3,7 @@ package com.bikeunirio.bicicletario.externo.service;
 import com.bikeunirio.bicicletario.externo.dto.CartaoDto;
 import com.bikeunirio.bicicletario.externo.dto.CobrancaDto;
 import com.bikeunirio.bicicletario.externo.dto.PedidoCobrancaDto;
-import com.bikeunirio.bicicletario.externo.dto.RespostaErroDto;
+import com.bikeunirio.bicicletario.externo.dto.RespostaHttpDto;
 import com.bikeunirio.bicicletario.externo.entity.Cobranca;
 import com.bikeunirio.bicicletario.externo.enums.CobrancaEnum;
 import com.bikeunirio.bicicletario.externo.mapper.CobrancaMapper;
@@ -74,7 +74,7 @@ class CobrancaServiceTest {
     @Test
     void validarCartaoCredito_Sucesso() {
         CartaoDto cartao = new CartaoDto();
-        RespostaErroDto resposta = cobrancaService.validarCartaoCredito(cartao);
+        RespostaHttpDto resposta = cobrancaService.validarCartaoCredito(cartao);
         assertNotNull(resposta);
         assertEquals(200, resposta.getStatus());
     }
@@ -86,7 +86,7 @@ class CobrancaServiceTest {
 
         // configura o Mock do WebClient para retornar sucesso
         prepararMocksWebClientSuccess();
-        when(paypalAutenticacao.getTokenAutenticacao()).thenReturn("TOKEN_FAKE");
+        when(paypalAutenticacao.getTokenAutenticacao(pedido)).thenReturn("TOKEN_FAKE");
 
         Cobranca cobrancaSalva = new Cobranca();
         cobrancaSalva.setStatus(String.valueOf(CobrancaEnum.PAGA));
@@ -116,12 +116,11 @@ class CobrancaServiceTest {
         cobrancaDto.setValorCobranca(15F);
         cobrancaDto.setIdCiclista(10L);
 
-
         prepararMocksWebClientSuccess();
-        when(paypalAutenticacao.getTokenAutenticacao()).thenReturn("TOKEN_FAKE");
+        when(paypalAutenticacao.getTokenAutenticacao(any(PedidoCobrancaDto.class))).thenReturn("TOKEN_FAKE");
 
         Cobranca cobrancaSalva = new Cobranca();
-        cobrancaSalva.setStatus("COMPLETED");
+        cobrancaSalva.setStatus(String.valueOf(CobrancaEnum.PAGA));
 
         when(cobrancaService.realizarCobranca(any(PedidoCobrancaDto.class))).thenReturn(cobrancaDto);
 
@@ -132,7 +131,7 @@ class CobrancaServiceTest {
         assertEquals(0, filaCobranca.size(), "O item deveria ter sido removido da fila real");
         assertEquals(1, resultados.size());
 
-        // Garante que o WebClient foi chamado 1 vez através do método interno
+        // Garante que o WebClient foi chamado 1 vez através do metodo interno
         verify(webClient, times(1)).post();
     }
 

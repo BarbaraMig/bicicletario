@@ -1,6 +1,7 @@
 package com.bikeunirio.bicicletario.externo.service;
 
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -15,6 +16,12 @@ import java.util.Map;
 public class PaypalAutenticacao {
     private final WebClient webClient;
 
+    @Value("${PAYPAL_CLIENT_ID}")
+    private String clientId;
+
+    @Value("${PAYPAL_SECRET}")
+    private String secret;
+
     private Instant expiracao;
     private String tokenAuth;
 
@@ -23,9 +30,7 @@ public class PaypalAutenticacao {
     }
 
     private String auth(){
-        String secret = "${PAYPAL_SECRET}";
-        String clientId = "${PAYPAL_CLIENT_ID}";
-        String auth = clientId + ":" + secret;
+        String auth = this.clientId + ":" + this.secret;
         return "Basic " + Base64.getEncoder().encodeToString(auth.getBytes());
     }
 

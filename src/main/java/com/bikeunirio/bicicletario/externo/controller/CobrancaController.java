@@ -3,7 +3,7 @@ package com.bikeunirio.bicicletario.externo.controller;
 import com.bikeunirio.bicicletario.externo.dto.CartaoDto;
 import com.bikeunirio.bicicletario.externo.dto.CobrancaDto;
 import com.bikeunirio.bicicletario.externo.dto.PedidoCobrancaDto;
-import com.bikeunirio.bicicletario.externo.dto.RespostaErroDto;
+import com.bikeunirio.bicicletario.externo.dto.RespostaHttpDto;
 import com.bikeunirio.bicicletario.externo.service.CobrancaService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -40,7 +40,7 @@ public class CobrancaController {
 
     @PostMapping("/validarCartaoCredito")
     public ResponseEntity<String> validarCartaoCredito(@RequestBody CartaoDto cartao){
-        RespostaErroDto resposta = cobrancaService.validarCartaoCredito(cartao);
+        RespostaHttpDto resposta = cobrancaService.validarCartaoCredito(cartao);
 
         if(resposta.getStatus() == 200)
             return ResponseEntity.ok().body(resposta.toString());

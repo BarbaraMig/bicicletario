@@ -3,7 +3,7 @@ package com.bikeunirio.bicicletario.externo.controller;
 import com.bikeunirio.bicicletario.externo.dto.CartaoDto;
 import com.bikeunirio.bicicletario.externo.dto.CobrancaDto;
 import com.bikeunirio.bicicletario.externo.dto.PedidoCobrancaDto;
-import com.bikeunirio.bicicletario.externo.dto.RespostaErroDto;
+import com.bikeunirio.bicicletario.externo.dto.RespostaHttpDto;
 import com.bikeunirio.bicicletario.externo.service.CobrancaService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -99,7 +99,7 @@ class CobrancaControllerTest {
     @Test
     void validarCartaoCredito_Sucesso() throws Exception {
         CartaoDto cartao = new CartaoDto();
-        RespostaErroDto resposta = new RespostaErroDto();
+        RespostaHttpDto resposta = new RespostaHttpDto();
         resposta.setStatus(200);
 
 
@@ -118,7 +118,7 @@ class CobrancaControllerTest {
     void validarCartaoCredito_Falha() throws Exception {
 
         CartaoDto cartao = new CartaoDto();
-        RespostaErroDto resposta = new RespostaErroDto();
+        RespostaHttpDto resposta = new RespostaHttpDto();
         resposta.setStatus(422); // Status de erro
 
         when(cobrancaService.validarCartaoCredito(any(CartaoDto.class))).thenReturn(resposta);

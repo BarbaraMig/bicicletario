@@ -1,5 +1,6 @@
 package com.bikeunirio.bicicletario.externo.service;
 
+import com.bikeunirio.bicicletario.externo.dto.PedidoCobrancaDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -62,7 +63,7 @@ class PaypalAutenticacaoTest {
                 .thenReturn(Mono.just(respostaPaypal));
 
         // ------- EXECUÇÃO -------
-        String tokenObtido = paypalAutenticacao.getTokenAutenticacao();
+        String tokenObtido = paypalAutenticacao.getTokenAutenticacao(any(PedidoCobrancaDto.class));
 
         // ------- VERIFICAÇÕES -------
         assertEquals("TOKEN_NOVO_123", tokenObtido);
@@ -80,7 +81,7 @@ class PaypalAutenticacaoTest {
         ReflectionTestUtils.setField(paypalAutenticacao, "expiracao", Instant.now().plusSeconds(3600));
 
         // ------- EXECUÇÃO -------
-        String tokenObtido = paypalAutenticacao.getTokenAutenticacao();
+        String tokenObtido = paypalAutenticacao.getTokenAutenticacao(any(PedidoCobrancaDto.class));
 
         // ------- VERIFICAÇÕES -------
         assertEquals("TOKEN_CACHEADO_ABC", tokenObtido);
@@ -112,7 +113,7 @@ class PaypalAutenticacaoTest {
                 .thenReturn(Mono.just(respostaPaypal));
 
         // ------- EXECUÇÃO -------
-        String tokenObtido = paypalAutenticacao.getTokenAutenticacao();
+        String tokenObtido = paypalAutenticacao.getTokenAutenticacao(any(PedidoCobrancaDto.class));
 
         // ------- VERIFICAÇÕES -------
         assertEquals("TOKEN_RENOVADO_999", tokenObtido);
@@ -121,7 +122,7 @@ class PaypalAutenticacaoTest {
 
     @Test
     void getTokenAutenticacao_FalhaApi() {
-        // ------- CENÁRIO -------
+        //config do webclient
         when(webClient.post()).thenReturn(requestBodyUriSpec);
         when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodySpec);
         when(requestBodySpec.header(any(), any())).thenReturn(requestBodySpec);
@@ -135,7 +136,7 @@ class PaypalAutenticacaoTest {
 
         //executa e valida
         assertThrows(RuntimeException.class, () -> {
-            paypalAutenticacao.getTokenAutenticacao();
+            paypalAutenticacao.getTokenAutenticacao(any(PedidoCobrancaDto.class));
         });
     }
 }

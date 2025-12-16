@@ -1,6 +1,6 @@
 package com.bikeunirio.bicicletario.externo.service;
 
-import com.bikeunirio.bicicletario.externo.SendGridClient;
+import com.bikeunirio.bicicletario.externo.client.SendGridClient;
 import com.bikeunirio.bicicletario.externo.config.SendGridConfigurationProperties;
 import com.bikeunirio.bicicletario.externo.dto.EmailDto;
 import org.springframework.stereotype.Service;

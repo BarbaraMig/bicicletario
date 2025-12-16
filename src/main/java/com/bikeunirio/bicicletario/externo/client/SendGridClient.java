@@ -1,4 +1,4 @@
-package com.bikeunirio.bicicletario.externo;
+package com.bikeunirio.bicicletario.externo.client;
 
 import com.sendgrid.helpers.mail.objects.Email;
 import com.sendgrid.*;

@@ -1,11 +1,11 @@
 package com.bikeunirio.bicicletario.externo.dto;
 
-public class RespostaErroDto {
+public class RespostaHttpDto {
     private Integer status;
     private String message;
 
-    public RespostaErroDto(){}
-    public RespostaErroDto(Integer status, String message){
+    public RespostaHttpDto(){}
+    public RespostaHttpDto(Integer status, String message){
         this.status=status;
         this.message=message;
     }

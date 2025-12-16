@@ -3,7 +3,7 @@ package com.bikeunirio.bicicletario.externo.service;
 import com.bikeunirio.bicicletario.externo.dto.CartaoDto;
 import com.bikeunirio.bicicletario.externo.dto.CobrancaDto;
 import com.bikeunirio.bicicletario.externo.dto.PedidoCobrancaDto;
-import com.bikeunirio.bicicletario.externo.dto.RespostaErroDto;
+import com.bikeunirio.bicicletario.externo.dto.RespostaHttpDto;
 import com.bikeunirio.bicicletario.externo.entity.Cobranca;
 import com.bikeunirio.bicicletario.externo.enums.CobrancaEnum;
 import com.bikeunirio.bicicletario.externo.mapper.CobrancaMapper;
@@ -12,11 +12,9 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.*;
 
 @Service
 public class CobrancaService {
@@ -26,6 +24,7 @@ public class CobrancaService {
     private final CobrancaRepository cobrancaRepository;
     private final List<Cobranca> filaCobranca;
     private final CobrancaMapper mapper;
+    String zoneId = "America/Sao_Paulo";
 
     public CobrancaService(PaypalAutenticacao paypalAutenticacao,
                            WebClient webClient,
@@ -41,56 +40,63 @@ public class CobrancaService {
 
     public CobrancaDto incluirCobrancaNaFila(PedidoCobrancaDto pedido) {
         Cobranca cobranca = new Cobranca();
+
         cobranca.setValor(pedido.getValor());
         cobranca.setIdCiclista(pedido.getIdCiclista());
         cobranca.setStatus(String.valueOf(CobrancaEnum.PENDENTE));
+        LocalDateTime horario = LocalDateTime.now(ZoneId.of(zoneId));
+        cobranca.setHoraSolicitacao(horario);
+        cobranca.setHoraFinalizacao(horario);
 
         filaCobranca.add(cobranca);
 
         return mapper.toDTO(cobranca);
     }
 
-    public RespostaErroDto validarCartaoCredito(CartaoDto cartao) {
-        RespostaErroDto resposta = new RespostaErroDto();
+    public RespostaHttpDto validarCartaoCredito(CartaoDto cartao) {
+        RespostaHttpDto resposta = new RespostaHttpDto();
         resposta.setStatus(200);
-        resposta.setMessage("não programado para validar o cartão de "+ cartao.getNomeTitular());
+        resposta.setMessage("dados atualizados do cartão de "+ cartao.getNomeTitular());
         return resposta;
     }
 
     public CobrancaDto realizarCobranca(PedidoCobrancaDto pedido) {
+        Cobranca cobranca = new Cobranca();
+        cobranca.setHoraSolicitacao(LocalDateTime.now(ZoneId.of(zoneId)));
+        cobranca.setIdCiclista(pedido.getIdCiclista());
+
         //metodo que recupera/gera um token de autenticação para a API
         String token = paypalAutenticacao.getTokenAutenticacao();
 
-        //chamada ao webclient
-        Map<String, Object> respostaExterno = webClient.post()
-                .uri("/v1/payments/payment")
-                .header("Authorization", "Bearer " + token)
-                .bodyValue(pedido)
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
-                .block();
+        Map<String, Object> respostaExterno = montarRequisicaoCobranca(pedido, token);
 
-        Cobranca cobranca = new Cobranca();
+
         cobranca.setValor(pedido.getValor());
 
         //caso a resposta não seja null e exista o atributo status -> getStatus
-        //caso contrário, marca a cobraça como Erro
-        String status = (respostaExterno != null && respostaExterno.containsKey("status"))
-                ? (String) respostaExterno.get("status")
-                : String.valueOf(CobrancaEnum.ERRO);
-
-        cobranca.setStatus(status);
-
+        //caso contrário, marca a cobraça como FALHA
+        if (respostaExterno != null && respostaExterno.containsKey("status")) {
+            String statusAPI = String.valueOf(respostaExterno.get("status"));
+            if ("CREATED".equals(statusAPI)) {
+                cobranca.setStatus(CobrancaEnum.PAGA.toString());
+            } else if ("VOIDED".equals(statusAPI)) {
+                cobranca.setStatus(CobrancaEnum.CANCELADA.toString());
+            } else {
+                cobranca.setStatus(CobrancaEnum.FALHA.toString());
+            }
+        } else {
+            cobranca.setStatus(CobrancaEnum.FALHA.toString());
+        }
+        cobranca.setHoraFinalizacao(LocalDateTime.now(ZoneId.of(zoneId)));
         Cobranca entidadeSalva = cobrancaRepository.save(cobranca);
         return mapper.toDTO(entidadeSalva);
     }
 
     public Optional<CobrancaDto> obterCobranca(Long id) {
+
         return cobrancaRepository.findById(id)
                 .map(cobranca -> {
-                    CobrancaDto dto = new CobrancaDto();
-                    dto.setValorCobranca(cobranca.getValor());
-                    return dto;
+                    return mapper.toDTO(cobranca);
                 });
     }
 
@@ -116,5 +122,33 @@ public class CobrancaService {
         }
 
         return processadas;
+    }
+
+
+    private Map<String, Object> montarRequisicaoCobranca(PedidoCobrancaDto pedido, String token) {
+
+        Map<String, Object> amount = new HashMap<>();
+        amount.put("currency_code", "BRL");
+        amount.put("value", String.format(Locale.US, "%.2f", pedido.getValor()));
+
+
+        Map<String, Object> purchaseUnit = new HashMap<>();
+        purchaseUnit.put("amount", amount);
+        purchaseUnit.put("description", "Cobranca ID Ciclista: " + pedido.getIdCiclista());
+        purchaseUnit.put("reference_id", "default"); // Opcional, mas bom para rastreio
+
+
+        Map<String, Object> paypalRequest = new HashMap<>();
+        paypalRequest.put("intent", "CAPTURE"); // V2 usa CAPTURE ou AUTHORIZE
+        paypalRequest.put("purchase_units", Collections.singletonList(purchaseUnit));
+
+
+        return webClient.post()
+                .uri("/v2/checkout/orders") // <--- MUDANÇA IMPORTANTE: V2 URL
+                .header("Authorization", "Bearer " + token)
+                .bodyValue(paypalRequest)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
+                .block();
     }
 }

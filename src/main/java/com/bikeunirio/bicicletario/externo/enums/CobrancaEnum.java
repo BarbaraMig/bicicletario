@@ -4,5 +4,5 @@ public enum CobrancaEnum {
     PAGA,
     PENDENTE,
     CANCELADA,
-    ERRO
+    FALHA
 }
