@@ -25,9 +25,7 @@ class RestaurarDadosControllerTest {
         restaurarDadosController = new RestaurarDadosController(restaurarDadosServiceMock);
     }
 
-    /**
-     * Testa se o método do controller chama o serviço e retorna a ResponseEntity correta
-     */
+
     @Test
     void restaurarBanco_sucesso() {
         //criações necessárias
