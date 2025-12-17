@@ -25,7 +25,7 @@ class EmailServiceTest {
 
     @BeforeEach
     void setup() {
-        emailService = new EmailService(sendGridClient, props);
+        emailService = new EmailService(sendGridClient);
     }
 
     //CAMINHO FELIZ
@@ -47,9 +47,9 @@ class EmailServiceTest {
         assertDoesNotThrow(() -> emailService.enviarEmail(dto));
 
         verify(sendGridClient, times(1)).enviarEmail(
-                eq(dto.getReceptor()),
-                eq(dto.getAssunto()),
-                eq(dto.getMensagem())
+                dto.getReceptor(),
+                dto.getAssunto(),
+                dto.getMensagem()
         );
     }
 

@@ -27,7 +27,7 @@ public class CobrancaController {
         // se o Optional retornado em service.obterCobranca existir, converte para DTO e
         // retorna 200 OK. Se não, 404 Not Found.
         return cobrancaService.obterCobranca(idCobranca)
-                .map(cobrancaDto -> ResponseEntity.ok(cobrancaDto))
+                .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 

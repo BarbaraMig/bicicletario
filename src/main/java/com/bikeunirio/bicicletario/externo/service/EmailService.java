@@ -10,12 +10,9 @@ import org.springframework.util.StringUtils;
 public class EmailService {
 
     private final SendGridClient sendGridClient;
-    private final SendGridConfigurationProperties props;
 
-    public EmailService(SendGridClient sendGridClient,
-                        SendGridConfigurationProperties props) {
+    public EmailService(SendGridClient sendGridClient) {
         this.sendGridClient = sendGridClient;
-        this.props = props;
     }
 
     public void enviarEmail(EmailDto dto) {

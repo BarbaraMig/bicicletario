@@ -95,11 +95,8 @@ public class CobrancaService {
     }
 
     public Optional<CobrancaDto> obterCobranca(Long id) {
-
         return cobrancaRepository.findById(id)
-                .map(cobranca -> {
-                    return mapper.toDTO(cobranca);
-                });
+                .map(mapper::toDTO);
     }
 
     public List<CobrancaDto> processaCobrancasEmFila() {
