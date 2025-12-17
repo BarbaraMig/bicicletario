@@ -11,8 +11,6 @@ public class Cobranca{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    private String idApi;
-
     private String status;
 
     @Column(columnDefinition = "DATETIME")
@@ -31,14 +29,6 @@ public class Cobranca{
 
     public void setId(long id) {
         this.id = id;
-    }
-
-    public String getIdApi() {
-        return idApi;
-    }
-
-    public void setIdApi(String idApi) {
-        this.idApi = idApi;
     }
 
     public String getStatus() {

@@ -29,19 +29,5 @@ public class GlobalExceptionHandler{
         return ResponseEntity.status(respostaDto.getStatus()).body(respostaDto);
     }
 
-    @ExceptionHandler(HttpClientErrorException.UnprocessableEntity.class)
-    public ResponseEntity<RespostaHttpDto> handleUnprocessableEntity(HttpClientErrorException.UnprocessableEntity exception){
-        RespostaHttpDto respostaDto = new RespostaHttpDto(HttpStatus.UNPROCESSABLE_ENTITY.value(),exception.getMessage());
-
-        return ResponseEntity.status(respostaDto.getStatus()).body(respostaDto);
-    }
-
-    @ExceptionHandler(HttpClientErrorException.NotFound.class)
-    public ResponseEntity<RespostaHttpDto> handleNotFound(HttpClientErrorException.NotFound exception){
-        RespostaHttpDto respostaDto = new RespostaHttpDto(HttpStatus.NOT_FOUND.value(),exception.getMessage());
-
-        return ResponseEntity.status(respostaDto.getStatus()).body(respostaDto);
-    }
-
 
 }

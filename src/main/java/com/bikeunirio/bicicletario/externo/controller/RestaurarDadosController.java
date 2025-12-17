@@ -1,5 +1,6 @@
 package com.bikeunirio.bicicletario.externo.controller;
 
+import com.bikeunirio.bicicletario.externo.dto.RespostaHttpDto;
 import com.bikeunirio.bicicletario.externo.service.RestaurarDadosService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,9 +18,7 @@ public class RestaurarDadosController {
     }
 
     @GetMapping("/restaurarBanco")
-    public ResponseEntity<Void> restaurar() {
-        restaurarDadosService.restaurarBanco();
-
-        return ResponseEntity.ok().build();
+    public ResponseEntity<RespostaHttpDto> restaurarBanco() {
+        return ResponseEntity.ok().body(restaurarDadosService.restaurarBanco());
     }
 }

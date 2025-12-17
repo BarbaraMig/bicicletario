@@ -134,11 +134,11 @@ class CobrancaServiceTest {
 
         // 2. Mocks do Repository e Mapper (usados dentro de realizarCobranca)
         Cobranca cobrancaSalva = new Cobranca();
-        cobrancaSalva.setStatus("PAGA");
+        cobrancaSalva.setStatus(CobrancaEnum.PAGA.name());
         when(cobrancaRepository.save(any(Cobranca.class))).thenReturn(cobrancaSalva);
 
         CobrancaDto dtoSucesso = new CobrancaDto();
-        dtoSucesso.setStatus("PAGA");
+        dtoSucesso.setStatus(CobrancaEnum.PAGA.name());
         when(mapper.toDTO(any(Cobranca.class))).thenReturn(dtoSucesso);
 
         // Execução
