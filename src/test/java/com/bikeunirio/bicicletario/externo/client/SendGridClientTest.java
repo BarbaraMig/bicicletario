@@ -17,9 +17,9 @@ class SendGridClientTest {
     private SendGridClient sendGridClient;
     private SendGrid sendGridMock;
 
-    private final String TO_EMAIL = "teste@email.com";
-    private final String SUBJECT = "Assunto de Teste";
-    private final String BODY = "Corpo do Email de Teste";
+    private static final String TO_EMAIL = "teste@email.com";
+    private static final String SUBJECT = "Assunto de Teste";
+    private static final String BODY = "Corpo do Email de Teste";
 
     @BeforeEach
     void setUp() {
@@ -42,7 +42,7 @@ class SendGridClientTest {
         // 2. Chama o metodo a ser testado
         sendGridClient.enviarEmail(TO_EMAIL, SUBJECT, BODY);
 
-        // 3. Verifica se o método api do SendGrid foi chamado exatamente uma vez
+        // 3. Verifica se o metodo api do SendGrid foi chamado exatamente uma vez
         verify(sendGridMock, times(1)).api(any(Request.class));
 
         // Opcional: Verifica se a Request foi construída corretamente (capturando o argumento)
@@ -65,7 +65,7 @@ class SendGridClientTest {
 
         when(sendGridMock.api(any(Request.class))).thenReturn(errorResponse);
 
-        // 2. Verifica se a chamada do método lança a exceção esperada
+        // 2. Verifica se a chamada do metodo lança a exceção esperada
         IllegalStateException exception = assertThrows(
                 IllegalStateException.class,
                 () -> sendGridClient.enviarEmail(TO_EMAIL, SUBJECT, BODY)

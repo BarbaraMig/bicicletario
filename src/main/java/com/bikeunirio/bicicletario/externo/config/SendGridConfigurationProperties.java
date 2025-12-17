@@ -16,9 +16,9 @@ public class SendGridConfigurationProperties {
     private String apiKey;
 
     @Email
-    private final static String fromEmail = "emailexternoes2@gmail.com";
+    private static final String FROM_EMAIL = "emailexternoes2@gmail.com";
 
-    private final static String fromName = "BikeUnirio";
+    private static final String FROM_NAME = "BikeUnirio";
 
     public String getApiKey() {
         return apiKey;
@@ -29,10 +29,10 @@ public class SendGridConfigurationProperties {
     }
 
     public String getFromEmail() {
-        return fromEmail;
+        return FROM_EMAIL;
     }
 
     public String getFromName() {
-        return fromName;
+        return FROM_NAME;
     }
 }

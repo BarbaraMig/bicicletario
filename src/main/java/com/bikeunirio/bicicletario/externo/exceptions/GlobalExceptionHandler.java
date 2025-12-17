@@ -7,9 +7,6 @@ import org.springframework.mail.MailException;
 import org.springframework.mail.MailParseException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.client.HttpClientErrorException;
-
-
 
 @RestControllerAdvice
 public class GlobalExceptionHandler{
