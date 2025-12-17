@@ -32,6 +32,7 @@ public class RestaurarDadosService {
         cobranca1.setHoraSolicitacao(LocalDateTime.now(ZoneId.of("America/Sao_Paulo")));
         cobranca1.setValor(10F);
         cobranca1.setIdCiclista(3L);
+        cobrancaRepository.save(cobranca1);
 
         Cobranca cobranca2 = new Cobranca();
         cobranca2.setId(2);
@@ -39,6 +40,7 @@ public class RestaurarDadosService {
         cobranca2.setHoraSolicitacao(LocalDateTime.now(ZoneId.of("America/Sao_Paulo")));
         cobranca2.setValor(25.5F);
         cobranca2.setIdCiclista(4L);
+        cobrancaRepository.save(cobranca2);
 
         return new RespostaHttpDto(HttpStatus.SC_OK,"Banco restaurado");
     }
